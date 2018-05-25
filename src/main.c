@@ -1,24 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include "pdi.h"
 
 /** As funções dos outros .h (tipo abreImagem(...,...)) 
  * criaremos aqui posteriormente. **/
 
 int main (){
+	srand(time(NULL));
 	char *nome = {"../resultados/ALCode.png"};
 
 	Imagem *img;
-
+	int rando1, rando2;
 	img = abreImagem(nome, 1);
 	img = criaImagem(50,50,1);
 
 	for (int j = 0; j < 50; j += 1) {
 		for (int i = 0; i < 50; i += 1) {
+			rando1 = rand()%50;
+			rando2 = rand()%50;
 			// Aqui é onde vai ficar a informação!!!
-			if ((i > 7 && i < 42) || (j > 7 && j < 42) || (i > 41 && j > 41))
-				img->dados[0][j][i] = 0.5f;
+			if ((i > 7 && i < 42) || (j > 7 && j < 42) || (i > 41 && j > 41)) {
+				if((rando1 > 7 && rando1 < 42) || (rando2 > 7 && rando2 < 42) 
+						|| (rando1 > 41 && rando2 > 41))
+					img->dados[0][rando2][rando1] = 1.0f;
+			}
 			// Quadrados
 			else {
 				/** Moldura externa **/
