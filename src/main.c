@@ -17,9 +17,7 @@ int main (){
 	for (int j = 0; j < 50; j += 1) {
 		for (int i = 0; i < 50; i += 1) {
 			// Aqui é onde vai ficar a informação!!!
-			if ((i > 7 && i < 42)|| (j > 7 && j < 42))
-				img->dados[0][j][i] = 0.5f;
-			else if (i > 41 && j > 41)
+			if ((i > 7 && i < 42) || (j > 7 && j < 42) || (i > 41 && j > 41))
 				img->dados[0][j][i] = 0.5f;
 			// Quadrados
 			else {
