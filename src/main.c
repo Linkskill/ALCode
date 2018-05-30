@@ -12,16 +12,20 @@ int main (){
 	char *nome = {"../resultados/ALCode.png"};
 	//Informação a ser inserida no AL Code -> Hello World!
 	//char *msg = {"Hello World!"};
-	//Em binário fica:
-	long long int msgBin[6] = {1001000011001010, 1101100011011000, 1101111001000000, 
-								1010111011011110, 1110010011011000, 1100100001000010};
-	//descartando o primeiro zero o resultado fica o mesmo se tivesse o primeiro zero
-	//mas, para não perder o último número, coloca-se mais um zero no final
-	long long int divis = 1000000000000000, divisAux = divis;
-	int aux, count = 0;
+	//Em binário fica: 
+	//	0100 1000 0110 0101, 0110 1100 0110 1100, 0110 1111 0010 0000, 
+	//	0101 0111 0110 1111, 0111 0010 0110 1100, 0110 0100 0010 0001
+	//descarta-se o primeiro zero para realizar a divisão 
+	long long int msgBin[6] = {100100001100101, 110110001101100, 110111100100000, 
+								101011101101111, 111001001101100, 110010000100001};
+	long long int divis = 100000000000000, divisAux = divis;
+	//aux armazena o bit, count o indice de msgBin e flag marca a primeira iteração
+	//para repor o zero faltante
+	int aux, count = 0, flag = 1;
 
 	//img é o AL Code e imgAux é um mapa pra ver onde vai a informação
 	Imagem *img, *imgAux;
+	//gera cor branca em posições aleatórias da imagem
 	int rando1, rando2;
 	img = abreImagem(nome, 1);
 	img = criaImagem(50,50,1);
@@ -73,20 +77,24 @@ int main (){
 	for (int j = 32; j < 42; j += 1) {
 		for (int i = 32; i < 42; i += 1) {
 			img->dados[0][j][i] = 0.0f;
-			if(divisAux > 9 && count < 6){
+			if(flag == 1 && count < 6){
+				aux = 0;
+				flag = 0;
+//				printf("aux: %d\n", aux);
+//				printf("divisAux: %lld\n", divisAux);
+			}
+			else if(divisAux > 0 && count < 6){
 				aux = (msgBin[count]/divisAux)%10;
-				printf("aux: %d\n", aux);
 				if(aux == 1)
 					img->dados[0][j][i] = 1.0f;
-				else
-					img->dados[0][j][i] = 0.0f;
-				printf ("divisAux: %lld\n", divisAux);
+//				printf("aux: %d\n", aux);
+//				printf("divisAux: %lld\n", divisAux);
 				divisAux /= 10;
-			}
-			else{ 
-				divisAux = divis;
-				if (count < 6)
+				if(divisAux < 1) {
+					divisAux = divis;
 					count++;
+					flag = 1;
+				}
 			}
 		}
 	}
