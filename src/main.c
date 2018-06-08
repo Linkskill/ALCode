@@ -132,10 +132,6 @@ bool ** initALcode(int ALsize, blocks **b, int bsize) {
 			matrix[i][j + 8] = ((*b)[i + 8]).binaryValue[j];
 		}
 	}
-
-	/* if(bsize > 8) {
-		for(int i = 0; i < )
-	} */
 	
 	return matrix;
 }
