@@ -85,11 +85,11 @@ bool ** initALcode(int ALsize, blocks **b, int bsize) {
 	bool **matrix = malloc(ALsize * sizeof(bool *));
 	for(int i = 0; i < ALsize; i += 1) matrix[i] = malloc(ALsize * sizeof(bool));
 
-	for(int i = 0; i < 7; i += 1) {
-		matrix[0][i] = 0;
-		matrix[6][i] = 0;
-		matrix[i][0] = 0;
-		matrix[i][6] = 0;
+	for(int i = 1; i < 6; i += 1) {
+		matrix[1][i] = 1;
+		matrix[5][i] = 1;
+		matrix[i][1] = 1;
+		matrix[i][5] = 1;
 	}
 
 	for(int i = 2; i < 5; i += 1) {
