@@ -11,17 +11,20 @@ typedef struct {
 	bool binaryValue[8];
 } blocks;
 
-/** As funções dos outros .h (tipo abreImagem(...,...)) 
- * criaremos aqui posteriormente. **/
 int messageToBinary(blocks **b, char *message);
+bool ** initALcode(int ALsize, blocks **b, int bsize);
+void printMatrix(bool **matrix, int size);
 void printBlocks(blocks **b, int size);
 
 int main () {
 	
 	blocks *binaryMessage;
-	int size;
-	size = messageToBinary(&binaryMessage, "abcdefghijklmnopqrstuvwxyz");
-	printBlocks(&binaryMessage, size);
+	int bsize;
+	bsize = messageToBinary(&binaryMessage, "abcdefghijklmnopqrstuvwxyz");
+	
+	int ALsize = 16;
+	bool **ALcode = initALcode(ALsize, &binaryMessage, bsize);
+	printMatrix(ALcode, ALsize);
 
 	return 0;
 }
@@ -31,7 +34,7 @@ int messageToBinary(blocks **b, char *message) {
 	unsigned int size = (unsigned) strlen(message);
 	*b = malloc(size * sizeof(blocks));
 
-	for(int i = 0; i < size; i += 1) {
+	for(unsigned int i = 0; i < size; i += 1) {
 		aux = message[i];
 		((*b)[i]).decimalValue = (unsigned) aux;		
 
@@ -72,20 +75,69 @@ int messageToBinary(blocks **b, char *message) {
 	return size;
 }
 
-bool ** initCode(int size) {
+bool ** initALcode(int ALsize, blocks **b, int bsize) {
 
+	if(ALsize < 7) {
+		printf("Erro, tamanho deve ser no mínimo 7.\n");
+		return NULL;
+	}
+
+	bool **matrix = malloc(ALsize * sizeof(bool *));
+	for(int i = 0; i < ALsize; i += 1) matrix[i] = malloc(ALsize * sizeof(bool));
+
+	for(int i = 0; i < 7; i += 1) {
+		matrix[0][i] = 0;
+		matrix[6][i] = 0;
+		matrix[i][0] = 0;
+		matrix[i][6] = 0;
+	}
+
+	for(int i = 2; i < 5; i += 1) {
+		for(int j = 2; j < 5; j += 1) {
+			matrix[i][j] = 0;
+		}
+	}
+
+	for(int i = 0; i < 8 && i < bsize; i += 1) {
+		for(int j = 0; j < 8; j += 1) {
+			matrix[i][j + 8] = ((*b)[i]).binaryValue[j];
+		}
+	}
+
+	/* if(bsize > 8) {
+		for(int i = 0; i < )
+	} */
+	
+	return matrix;
+}
+
+void printMatrix(bool **matrix, int size) {
+	if(matrix) {
+		for(int i = 0; i < size; i += 1) {
+			for(int j = 0; j < size; j += 1) {			
+				printf("%d ", matrix[i][j]);
+			}
+			printf("\n");
+		}
+	}
+	else
+		printf("Erro, a matriz nao existe.\n");
 }
 
 void printBlocks(blocks **b, int size) {
-	for(int i = 0; i < size; i += 1) {
-		printf("Decimal value: %d\n", ((*b)[i]).decimalValue);
-		printf("Binary value: ");
-		for(int j = 0; j < 8; j += 1) {
-			if (((*b)[i]).binaryValue[j]) printf("1");
-			else printf("0");
+	if(b) {
+		for(int i = 0; i < size; i += 1) {
+			printf("Decimal value: %d\n", ((*b)[i]).decimalValue);
+			printf("Binary value: ");
+			for(int j = 0; j < 8; j += 1) {
+				if (((*b)[i]).binaryValue[j]) printf("1");
+				else printf("0");
+			}
+			printf("\n");
 		}
-		printf("\n");
 	}
+	else
+		printf("Erro, os blocos nao existem.");
 }
 
 
