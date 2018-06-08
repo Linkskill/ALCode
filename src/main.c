@@ -15,17 +15,35 @@ int messageToBinary(blocks **b, char *message);
 bool ** initALcode(int ALsize, blocks **b, int bsize);
 void printMatrix(bool **matrix, int size);
 void printBlocks(blocks **b, int size);
+void matrixToImage(Imagem *ALCimg, bool **ALCmatrix);
 
 int main () {
 	
+	char *nome = {"../imagens/ALCode.png"};
+	char *nomeP = {"../imagens/ALCPic.png"};
 	blocks *binaryMessage;
 	int bsize;
 	bsize = messageToBinary(&binaryMessage, "abcdefghijklmnopqrstuvwxyz");
+	Imagem *ALCimg, *ALCpic;
 	
 	int ALsize = 16;
 	bool **ALcode = initALcode(ALsize, &binaryMessage, bsize);
 	printMatrix(ALcode, ALsize);
 
+	ALCimg = abreImagem(nome, 1);
+	ALCimg = criaImagem(2*ALsize, 2*ALsize, 1);
+
+	ALCpic = abreImagem(nomeP, 1);
+	ALCpic = criaImagem(16*ALsize, 16*ALsize, 1);
+
+	matrixToImage(ALCimg, ALcode);
+	redimensionaNN(ALCimg, ALCpic);
+
+	salvaImagem(ALCimg, nome);
+	salvaImagem(ALCpic, nomeP);
+
+	destroiImagem(ALCimg);
+	destroiImagem(ALCpic);
 	return 0;
 }
 
@@ -97,9 +115,21 @@ bool ** initALcode(int ALsize, blocks **b, int bsize) {
 		matrix[i][7] = 1;
 	}
 
-	for(int i = 0; i < 8 && i < bsize; i += 1) {
+	for(int i = 0; i < 8; i += 1) {
 		for(int j = 0; j < 8; j += 1) {
 			matrix[i][j + 8] = ((*b)[i]).binaryValue[j];
+		}
+	}
+
+	for(int i = 8; i < ALsize; i += 1) {
+		for(int j = 0; j < 8; j += 1) {
+			matrix[i][j] = ((*b)[i]).binaryValue[j];
+		}
+	}
+
+	for(int i = 8; i < ALsize; i += 1) {
+		for(int j = 0; j < 8; j += 1) {
+			matrix[i][j + 8] = ((*b)[i + 8]).binaryValue[j];
 		}
 	}
 
@@ -137,6 +167,44 @@ void printBlocks(blocks **b, int size) {
 	}
 	else
 		printf("Erro, os blocos nao existem.");
+}
+
+void matrixToImage(Imagem *ALCimg, bool **ALCmatrix) {
+	for(int i = 0; i < ALCimg->altura/2; i += 1) {
+		for(int j = 0; j < ALCimg->largura/2; j += 1) {
+			if(ALCmatrix[i][j])
+				ALCimg->dados[0][i][j] = 1.0f;
+			else
+				ALCimg->dados[0][i][j] = 0.0f;
+		}
+	}
+	
+	for(int i = 0; i < ALCimg->altura/2; i += 1) {
+		for(int j = ALCimg->largura/2; j < ALCimg->largura; j += 1) {
+			if(ALCmatrix[i][ALCimg->largura - j - 1])
+				ALCimg->dados[0][i][j] = 1.0f;
+			else
+				ALCimg->dados[0][i][j] = 0.0f;
+		}
+	}
+	
+	for(int i = ALCimg->altura/2; i < ALCimg->altura; i += 1) {
+		for(int j = 0; j < ALCimg->largura/2; j += 1) {
+			if(ALCmatrix[ALCimg->altura - i - 1][j])
+				ALCimg->dados[0][i][j] = 1.0f;
+			else
+				ALCimg->dados[0][i][j] = 0.0f;
+		}
+	}
+	
+	for(int i = ALCimg->altura/2; i < ALCimg->altura; i += 1) {
+		for(int j = ALCimg->largura/2; j < ALCimg->largura; j += 1) {
+			if(ALCmatrix[ALCimg->altura - i - 1][ALCimg->largura - j - 1])
+				ALCimg->dados[0][i][j] = 1.0f;
+			else
+				ALCimg->dados[0][i][j] = 0.0f;
+		}
+	}
 }
 
 

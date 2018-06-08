@@ -10,4 +10,4 @@ debug:
 
 clean:
 	rm a.out
-	rm ../resultados/*
+	rm ../imagens/*
