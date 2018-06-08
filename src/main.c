@@ -92,10 +92,9 @@ bool ** initALcode(int ALsize, blocks **b, int bsize) {
 		matrix[i][5] = 1;
 	}
 
-	for(int i = 2; i < 5; i += 1) {
-		for(int j = 2; j < 5; j += 1) {
-			matrix[i][j] = 0;
-		}
+	for(int i = 0; i < 8; i += 1) {
+		matrix[7][i] = 1;
+		matrix[i][7] = 1;
 	}
 
 	for(int i = 0; i < 8 && i < bsize; i += 1) {
