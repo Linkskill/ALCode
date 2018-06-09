@@ -19,8 +19,8 @@ void matrixToImage(Imagem *ALCimg, bool **ALCmatrix);
 
 int main () {
 	
-	char *nome = {"../imagens/ALCode.png"};
-	char *nomeP = {"../imagens/ALCPic.png"};
+	char *nome = {"../resultados/ALCode.png"};
+	char *nomeP = {"../resultados/ALCPic.png"};
 	blocks *binaryMessage;
 	int bsize;
 	bsize = messageToBinary(&binaryMessage, "abcdefghijklmnopqrstuvwxyz");
