@@ -15,6 +15,7 @@ int messageToBinary(blocks **b, char *message);
 bool ** initALcode(int ALsize, blocks **b, int bsize);
 void printMatrix(bool **matrix, int size);
 void printBlocks(blocks **b, int size);
+bool ** transpose(bool **matrix, int size);
 void matrixToImage(Imagem *ALCimg, bool **ALCmatrix);
 
 int main () {
@@ -23,12 +24,14 @@ int main () {
 	char *nomeP = {"../resultados/ALCPic.png"};
 	blocks *binaryMessage;
 	int bsize;
-	bsize = messageToBinary(&binaryMessage, "abcdefghijklmnopqrstuvwxyz");
+	bsize = messageToBinary(&binaryMessage, "aurelinks");
 	Imagem *ALCimg, *ALCpic;
 	
 	int ALsize = 16;
 	bool **ALcode = initALcode(ALsize, &binaryMessage, bsize);
 	printMatrix(ALcode, ALsize);
+	printf("\n");
+	printMatrix(transpose(ALcode, ALsize), ALsize);
 
 	ALCimg = abreImagem(nome, 1);
 	ALCimg = criaImagem(2*ALsize, 2*ALsize, 1);
@@ -116,21 +119,33 @@ bool ** initALcode(int ALsize, blocks **b, int bsize) {
 	}
 
 	for(int i = 0; i < 8; i += 1) {
-		for(int j = 0; j < 8; j += 1) {
-			matrix[i][j + 8] = ((*b)[i]).binaryValue[j];
+		if(bsize > i) {
+			for(int j = 0; j < 8; j += 1) {
+					matrix[i][j + 8] = ((*b)[i]).binaryValue[j];
+			}
 		}
+		else
+			break;
 	}
 
 	for(int i = 8; i < ALsize; i += 1) {
-		for(int j = 0; j < 8; j += 1) {
-			matrix[i][j] = ((*b)[i]).binaryValue[j];
+		if(bsize > i) {
+			for(int j = 0; j < 8; j += 1) {
+				matrix[i][j] = ((*b)[i]).binaryValue[j];
+			}
 		}
+		else
+			break;
 	}
 
 	for(int i = 8; i < ALsize; i += 1) {
-		for(int j = 0; j < 8; j += 1) {
-			matrix[i][j + 8] = ((*b)[i + 8]).binaryValue[j];
+		if(bsize > i + 8) {
+			for(int j = 0; j < 8; j += 1) {
+				matrix[i][j + 8] = ((*b)[i + 8]).binaryValue[j];
+			}
 		}
+		else
+			break;
 	}
 	
 	return matrix;
@@ -163,6 +178,19 @@ void printBlocks(blocks **b, int size) {
 	}
 	else
 		printf("Erro, os blocos nao existem.");
+}
+
+bool ** transpose(bool **matrix, int size) {
+	bool **transpose = malloc(size * sizeof(bool *));
+	for(int i = 0; i < size; i += 1) transpose[i] = malloc(size * sizeof(bool));
+
+	for(int i = 0; i < size; i += 1) {
+		for(int j = 0; j < size; j += 1) {
+			transpose[j][size - i - 1] = matrix[i][j];
+		}
+	} 
+
+	return transpose;
 }
 
 void matrixToImage(Imagem *ALCimg, bool **ALCmatrix) {
