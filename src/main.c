@@ -24,14 +24,11 @@ int main () {
 	char *nomeP = {"../resultados/ALCPic.png"};
 	blocks *binaryMessage;
 	int bsize;
-	bsize = messageToBinary(&binaryMessage, "aurelinks");
+	bsize = messageToBinary(&binaryMessage, "abserglajdlckejtlsjcjgls");
 	Imagem *ALCimg, *ALCpic;
 	
 	int ALsize = 16;
 	bool **ALcode = initALcode(ALsize, &binaryMessage, bsize);
-	printMatrix(ALcode, ALsize);
-	printf("\n");
-	printMatrix(transpose(ALcode, ALsize), ALsize);
 
 	ALCimg = abreImagem(nome, 1);
 	ALCimg = criaImagem(2*ALsize, 2*ALsize, 1);
@@ -194,43 +191,25 @@ bool ** transpose(bool **matrix, int size) {
 }
 
 void matrixToImage(Imagem *ALCimg, bool **ALCmatrix) {
-	for(int i = 0; i < ALCimg->altura/2; i += 1) {
-		for(int j = 0; j < ALCimg->largura/2; j += 1) {
-			if(ALCmatrix[i][j])
-				ALCimg->dados[0][i][j] = 1.0f;
-			else
-				ALCimg->dados[0][i][j] = 0.0f;
+	int line = 0;
+	int column = 0;
+	for(int i = 0; i < 4; i += 1) {
+		int mline = 0;
+		int mcolumn = 0;
+		for(int y = line; y < line + ALCimg->altura / 2; y += 1) {
+			for(int x = column; x < column + ALCimg->largura / 2; x += 1) {
+				if(ALCmatrix[mline][mcolumn])
+					ALCimg->dados[0][y][x] = 1.0f;
+				else
+					ALCimg->dados[0][y][x] = 0.0f;
+				mcolumn += 1;
+			}
+			mcolumn = 0;
+			mline += 1;
 		}
-	}
-	
-	for(int i = 0; i < ALCimg->altura/2; i += 1) {
-		for(int j = ALCimg->largura/2; j < ALCimg->largura; j += 1) {
-			if(ALCmatrix[i][ALCimg->largura - j - 1])
-				ALCimg->dados[0][i][j] = 1.0f;
-			else
-				ALCimg->dados[0][i][j] = 0.0f;
-		}
-	}
-	
-	for(int i = ALCimg->altura/2; i < ALCimg->altura; i += 1) {
-		for(int j = 0; j < ALCimg->largura/2; j += 1) {
-			if(ALCmatrix[ALCimg->altura - i - 1][j])
-				ALCimg->dados[0][i][j] = 1.0f;
-			else
-				ALCimg->dados[0][i][j] = 0.0f;
-		}
-	}
-	
-	for(int i = ALCimg->altura/2; i < ALCimg->altura; i += 1) {
-		for(int j = ALCimg->largura/2; j < ALCimg->largura; j += 1) {
-			if(ALCmatrix[ALCimg->altura - i - 1][ALCimg->largura - j - 1])
-				ALCimg->dados[0][i][j] = 1.0f;
-			else
-				ALCimg->dados[0][i][j] = 0.0f;
-		}
+		if(i == 0)		column += ALCimg->largura / 2;
+		else if(i == 1)	line += ALCimg->altura / 2;
+		else			column -= ALCimg->largura / 2;
+		ALCmatrix = transpose(ALCmatrix, ALCimg->altura / 2);
 	}
 }
-
-
-
-
