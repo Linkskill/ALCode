@@ -24,7 +24,8 @@ int main () {
 	char *nomeP = {"../resultados/ALCPic.png"};
 	blocks *binaryMessage;
 	int bsize;
-	bsize = messageToBinary(&binaryMessage, "abserglajdlckejtlsjcjgls");
+	bsize = messageToBinary(&binaryMessage, "abcdefghijklmnopqrstuvwxyz");
+	//printBlocks(&binaryMessage, bsize);
 	Imagem *ALCimg, *ALCpic;
 	
 	int ALsize = 16;
@@ -47,6 +48,13 @@ int main () {
 	return 0;
 }
 
+/*  
+	int messageToBinary(blocks **b, char *message)
+
+	Função para transformar cada caracter da mensagem em binário.
+	Recebe como parâmetro um vetor de estruturas "blocks" (blocks **b) e um vetor
+	de caracteres (char *message) e retorna o tamanho final da estrutura.
+*/
 int messageToBinary(blocks **b, char *message) {
 	int aux;
 	unsigned int size = (unsigned) strlen(message);
@@ -56,43 +64,26 @@ int messageToBinary(blocks **b, char *message) {
 		aux = message[i];
 		((*b)[i]).decimalValue = (unsigned) aux;		
 
-		if(aux - 128 > -1) {
-			aux -= 128;
-			((*b)[i]).binaryValue[0] = true;
-		}
-		if(aux - 64 > -1) {
-			aux -= 64;
-			((*b)[i]).binaryValue[1] = true;
-		}
-		if(aux - 32 > -1) {
-			aux -= 32;
-			((*b)[i]).binaryValue[2] = true;
-		}
-		if(aux - 16 > -1) {
-			aux -= 16;
-			((*b)[i]).binaryValue[3] = true;
-		}
-		if(aux - 8 > -1) {
-			aux -= 8;
-			((*b)[i]).binaryValue[4] = true;
-		}
-		if(aux - 4 > -1) {
-			aux -= 4;
-			((*b)[i]).binaryValue[5] = true;
-		}
-		if(aux - 2 > -1) {
-			aux -= 2;
-			((*b)[i]).binaryValue[6] = true;
-		}
-		if(aux - 1 > -1) {
-			aux -= 1;
-			((*b)[i]).binaryValue[7] = true;
+		int base = 128;
+		for(int j = 0; j < 8; j += 1) {
+			if(aux - base > -1) {
+				aux -= base;
+				((*b)[i]).binaryValue[j] = true;
+			}
+			base /= 2;
 		}
 	}
 
 	return size;
 }
 
+/*  
+	bool ** initALcode(int ALsize, blocks **b, int bsize)
+
+	Função que retorna a matriz do ALcode dinâmicamente alocada, que é um quarteto da imagem final.
+	Recebe como parâmetro o tamanho que a matriz terá (int ALsize), a mensagem a ser inserida (blocks **b)
+	e o tamanho da mensagem (int bsize).	
+*/
 bool ** initALcode(int ALsize, blocks **b, int bsize) {
 
 	if(ALsize < 7) {
@@ -115,43 +106,37 @@ bool ** initALcode(int ALsize, blocks **b, int bsize) {
 		matrix[i][7] = 1;
 	}
 
-	for(int i = 0; i < 8; i += 1) {
-		if(bsize > i) {
-			for(int j = 0; j < 8; j += 1) {
-					matrix[i][j + 8] = ((*b)[i]).binaryValue[j];
-			}
-		}
-		else
-			break;
+	for(int i = 0; i < 8 && bsize > i; i += 1) {		
+		for(int j = 0; j < 8; j += 1) {
+				matrix[i][j + 8] = ((*b)[i]).binaryValue[j];
+		}	
 	}
 
-	for(int i = 8; i < ALsize; i += 1) {
-		if(bsize > i) {
-			for(int j = 0; j < 8; j += 1) {
-				matrix[i][j] = ((*b)[i]).binaryValue[j];
-			}
-		}
-		else
-			break;
+	for(int i = 8; i < ALsize && bsize > i; i += 1) {		
+		for(int j = 0; j < 8; j += 1) {
+			matrix[i][j] = ((*b)[i]).binaryValue[j];
+		}		
 	}
 
-	for(int i = 8; i < ALsize; i += 1) {
-		if(bsize > i + 8) {
-			for(int j = 0; j < 8; j += 1) {
-				matrix[i][j + 8] = ((*b)[i + 8]).binaryValue[j];
-			}
-		}
-		else
-			break;
+	for(int i = 8; i < ALsize && bsize > i + 8; i += 1) {		
+		for(int j = 0; j < 8; j += 1) {
+			matrix[i][j + 8] = ((*b)[i + 8]).binaryValue[j];
+		}		
 	}
 	
 	return matrix;
 }
 
+/*  
+	void printMatrix(bool **matrix, int size)
+
+	Imprime uma matriz, recebe como parâmetro uma matriz quadrada booleana (bool **matrix)
+	e o seu tamanho (int size) e imprime todos os seus elementos.
+*/
 void printMatrix(bool **matrix, int size) {
 	if(matrix) {
 		for(int i = 0; i < size; i += 1) {
-			for(int j = 0; j < size; j += 1) {			
+			for(int j = 0; j < size; j += 1) {
 				printf("%d ", matrix[i][j]);
 			}
 			printf("\n");
@@ -161,6 +146,13 @@ void printMatrix(bool **matrix, int size) {
 		printf("Erro, a matriz nao existe.\n");
 }
 
+/* 
+	void printBlocks(blocks **b, int size)
+
+	Imprime um vetor de estruturas "blocks", recebe como parâmetro 
+	os blocos (blocks **b) e quantos deles são (int size)
+	e imprime todos os seus elementos.
+*/
 void printBlocks(blocks **b, int size) {
 	if(b) {
 		for(int i = 0; i < size; i += 1) {
@@ -177,6 +169,13 @@ void printBlocks(blocks **b, int size) {
 		printf("Erro, os blocos nao existem.");
 }
 
+/*	
+	bool ** transpose(bool **matrix, int size)
+
+	Função que recebe como parâmetro uma matriz quadrada booleana (bool **matrix) e 
+	o seu tamanho (int size) e retorna a "transposta" dela, onde a primeira linha da 
+	matriz de entrada vira a última coluna da matriz de saída.
+*/
 bool ** transpose(bool **matrix, int size) {
 	bool **transpose = malloc(size * sizeof(bool *));
 	for(int i = 0; i < size; i += 1) transpose[i] = malloc(size * sizeof(bool));
@@ -190,6 +189,12 @@ bool ** transpose(bool **matrix, int size) {
 	return transpose;
 }
 
+/*  
+	void matrixToImage(Imagem *ALCimg, bool **ALCmatrix)
+
+	Função que "transcreve" a matriz do ALcode para uma imagem.
+	Recebe como parâmetro a imagem (Imagem *ALCimg) e a matriz (bool **ALCmatrix).
+*/
 void matrixToImage(Imagem *ALCimg, bool **ALCmatrix) {
 	int line = 0;
 	int column = 0;
