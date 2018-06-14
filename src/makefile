@@ -1,9 +1,10 @@
-run:
-	gcc *.c -Wall -Wextra -lm
+encode:
+	gcc main.c imagem.c alcode.c base.c cores.c desenho.c filtros2d.c geometria.c segmenta.c -Wall -Wextra -lm
 	./a.out
 
-fast:
-	gcc *.c -Wall -Wextra -Ofast -lm
+decode:
+	gcc aldecode.c imagem.c alcode.c base.c cores.c desenho.c filtros2d.c geometria.c segmenta.c -Wall -Wextra -lm
+	./a.out
 
 debug:
 	gcc -g *.c -Wall -Wextra -lm
