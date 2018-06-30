@@ -9,7 +9,7 @@
 /** Cria o AL Code **/
 #include "alcode.h"
 
-void restringeCentro(Imagem *in, Imagem *out);
+Imagem *restringeCentro(Imagem *in);
 
 int main(){
 
@@ -26,9 +26,8 @@ int main(){
 
     img = abreImagem("../resultados/ALCode.png",1);
     original = abreImagem("../imagens/HorizontalCentro.bmp",3);
-    teste = abreImagem("../resultados/Teste.png",3);
-
-    restringeCentro(original, teste);
+    
+    teste = restringeCentro(original);
 
     if(!img){
         printf("No image found!\n");
@@ -60,9 +59,9 @@ int main(){
 }
 
 
-void restringeCentro(Imagem *in, Imagem *out){
+Imagem *restringeCentro(Imagem *in){
     int prop;
-
+    Imagem *out;
     if(in->largura > in->altura){
         prop = in->largura;
         out = criaImagem(in->largura - 2*prop/4, in->altura - prop/5 + 1, in->n_canais);
@@ -79,4 +78,5 @@ void restringeCentro(Imagem *in, Imagem *out){
                 for (int k = prop/10; k < in->largura - prop/10; k++)
                     out->dados[i][j-prop/4][k-prop/10] = in->dados[i][j][k];
     }
+    return out;
 }
