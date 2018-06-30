@@ -25,9 +25,28 @@ int main(){
 
     Imagem *original, *teste;
 
-    original = abreImagem("../imagens/VerticalCentro.bmp",3);
+    original = abreImagem("../imagens/HorizontalCentro.bmp",3);
     
     teste = restringeCentro(original);
+
+    /* IDEIA OPCIONAL:
+     Podemos usar rotulação de componentes conexos para restringir melhor
+    o local onde fica o AL Code!
+    
+    Imagem *rotulo;
+    rotulo = criaImagem(teste->largura, teste->altura, teste->n_canais);
+
+    ComponenteConexo* componentes;
+    int n_componentes;
+    n_componentes = rotulaFloodFill (teste, &componentes, 4, 4, 16);
+
+    printf ("%d componentes detectados.\n", n_componentes);
+
+    for (int i = 0; i < n_componentes; i++)
+        desenhaRetangulo (componentes [i].roi, criaCor (1,1,1), rotulo);
+    salvaImagem (rotulo, "../resultados/Rotulo.bmp");
+    free (componentes);
+    */
 
     salvaImagem(teste, "../resultados/Teste.png");
     destroiImagem(original);
