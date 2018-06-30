@@ -4,6 +4,6 @@
 #include "pdi.h"
 #include "alcode.h"
 
-
+Imagem *restringeCentro(Imagem *in);
 
 #endif
