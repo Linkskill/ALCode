@@ -5,5 +5,6 @@
 #include "alcode.h"
 
 Imagem *restringeCentro(Imagem *in);
+Imagem *atribuiImagemCinza(Imagem *in);
 
 #endif

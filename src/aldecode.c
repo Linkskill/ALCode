@@ -23,34 +23,56 @@ int main(){
     por meio de um threshold 
     */
 
-    Imagem *original, *teste;
+    Imagem *original, *aux, *ALres, *cinza;
 
     original = abreImagem("../imagens/HorizontalCentro.bmp",3);
-    
-    teste = restringeCentro(original);
 
-    /* IDEIA OPCIONAL:
-     Podemos usar rotulação de componentes conexos para restringir melhor
-    o local onde fica o AL Code!
+    //aux = atribuiImagemCinza(original);
+
+    aux = restringeCentro(original);
+
+    cinza = atribuiImagemCinza(aux);
+
+    // IDEIA OPCIONAL:
+    // Podemos usar rotulação de componentes conexos para restringir melhor
+    //o local onde fica o AL Code!
     
     Imagem *rotulo;
-    rotulo = criaImagem(teste->largura, teste->altura, teste->n_canais);
+    rotulo = criaImagem(aux->largura, aux->altura, aux->n_canais);
 
-    ComponenteConexo* componentes;
-    int n_componentes;
-    n_componentes = rotulaFloodFill (teste, &componentes, 4, 4, 16);
+    ComponenteConexo* componentes, maiorComp;
+    int n_componentes, maiorCoordX = 0, maiorCoordY = 0;
+    n_componentes = rotulaFloodFill (cinza, &componentes, 4, 4, 16);
 
     printf ("%d componentes detectados.\n", n_componentes);
 
-    for (int i = 0; i < n_componentes; i++)
+    for (int i = 0; i < n_componentes; i++){
         desenhaRetangulo (componentes [i].roi, criaCor (1,1,1), rotulo);
-    salvaImagem (rotulo, "../resultados/Rotulo.bmp");
-    free (componentes);
-    */
+        if(maiorCoordY < componentes[i].roi.b-componentes[i].roi.c
+                && maiorCoordX < componentes[i].roi.d-componentes[i].roi.e) {
+            maiorCoordY = componentes[i].roi.b-componentes[i].roi.c;
+            maiorCoordX = componentes[i].roi.d-componentes[i].roi.e;
+            maiorComp = componentes[i];
+        }
+    }
 
-    salvaImagem(teste, "../resultados/Teste.png");
+    salvaImagem (rotulo, "../resultados/Rotulo.bmp");
+
+    ALres = criaImagem(maiorComp.roi.d - maiorComp.roi.e,
+                        maiorComp.roi.b - maiorComp.roi.c,3);
+
+    for (int k = 0; k < ALres->n_canais; k++)
+        for (int j = 0; j < ALres->altura; j++)
+            for (int i = 0; i < ALres->largura; i++)
+                ALres->dados[k][j][i] = aux->dados[k][j+maiorComp.roi.c][i+maiorComp.roi.e];
+
+    salvaImagem(aux, "../resultados/Teste.png");
+    salvaImagem(ALres, "../resultados/ALRes.png");
+    destroiImagem(ALres);
     destroiImagem(original);
-    destroiImagem(teste);
+    destroiImagem(aux);
+    destroiImagem(cinza);
+    free (componentes);
     return 0;
 }
 
@@ -60,24 +82,32 @@ Imagem *restringeCentro(Imagem *in){
     Imagem *out;
     if(in->largura > in->altura){
         prop = in->largura;
-        out = criaImagem(in->largura - 2*prop/4, in->altura - prop/5 + 1, 1);
-        for (int j = prop/10; j < in->altura - prop/10; j++)
-            for (int k = prop/4; k < in->largura - prop/4; k++)
-                if ((in->dados[0][j][k] + in->dados[1][j][k] + in->dados[2][j][k])/3 > 0.5f)
-                    out->dados[0][j-prop/10][k-prop/4] = 1.0f;
-                else
-                    out->dados[0][j-prop/10][k-prop/4] = 0.0f;
+        out = criaImagem(in->largura - 2*prop/4, in->altura - prop/5 + 1, 3);
+        for(int i = 0; i < in->n_canais; i++)
+            for (int j = prop/10; j < in->altura - prop/10; j++)
+                for (int k = prop/4; k < in->largura - prop/4; k++)
+                    out->dados[i][j-prop/10][k-prop/4] = in->dados[i][j][k];
     }
     else{
         prop = in->altura;
-        out = criaImagem(in->largura - prop/5 + 1, in->altura - 2*prop/4, 1);
-        for (int j = prop/4; j < in->altura - prop/4; j++)
-            for (int k = prop/10; k < in->largura - prop/10; k++)
-                if((in->dados[0][j][k] + in->dados[1][j][k] + in->dados[2][j][k])/3 > 0.5f)
-                    out->dados[0][j-prop/4][k-prop/10] = 1.0f;
-                else
-                    out->dados[0][j-prop/4][k-prop/10] = 0.0f;
+        out = criaImagem(in->largura - prop/5 + 1, in->altura - 2*prop/4, 3);
+        for(int i = 0; i < in->n_canais; i++)
+            for (int j = prop/4; j < in->altura - prop/4; j++)
+                for (int k = prop/10; k < in->largura - prop/10; k++)
+                    out->dados[i][j-prop/4][k-prop/10] = in->dados[i][j][k];
     }
+    return out;
+}
+
+Imagem *atribuiImagemCinza(Imagem *in){
+    Imagem *out;
+    out = criaImagem(in->largura, in->altura, 1);
+    for (int j = 0; j < in->altura; j++)
+        for (int k = 0; k < in->largura; k++)
+            if ((in->dados[0][j][k] + in->dados[1][j][k] + in->dados[2][j][k])/3 > 0.5f)
+                out->dados[0][j][k] = 1.0f;
+            else
+                out->dados[0][j][k] = 0.0f;
     return out;
 }
 
