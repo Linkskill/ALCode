@@ -9,6 +9,8 @@
 /** Cria o AL Code **/
 #include "alcode.h"
 
+void restringeCentro(Imagem *in, Imagem *out);
+
 int main(){
 
     /*
@@ -20,9 +22,13 @@ int main(){
     por meio de um threshold 
     */
 
-    Imagem *img;
+    Imagem *img, *original, *teste;
 
     img = abreImagem("../resultados/ALCode.png",1);
+    original = abreImagem("../imagens/HorizontalCentro.bmp",3);
+    teste = abreImagem("../resultados/Teste.png",3);
+
+    restringeCentro(original, teste);
 
     if(!img){
         printf("No image found!\n");
@@ -45,8 +51,32 @@ int main(){
         printf("\n");
     }
 
-
+    salvaImagem(teste, "../resultados/Teste.png");
 
     destroiImagem(img);
+    destroiImagem(original);
+    destroiImagem(teste);
     return 0;
+}
+
+
+void restringeCentro(Imagem *in, Imagem *out){
+    int prop;
+
+    if(in->largura > in->altura){
+        prop = in->largura;
+        out = criaImagem(in->largura - 2*prop/4, in->altura - prop/5 + 1, in->n_canais);
+        for (int i = 0; i < in->n_canais; i++)
+            for (int j = prop/10; j < in->altura - prop/10; j++)
+                for (int k = prop/4; k < in->largura - prop/4; k++)
+                    out->dados[i][j-prop/10][k-prop/4] = in->dados[i][j][k];
+    }
+    else{
+        prop = in->altura;
+        out = criaImagem(in->largura - prop/5 + 1, in->altura - 2*prop/4, in->n_canais);
+        for (int i = 0; i < in->n_canais; i++)
+            for (int j = prop/4; j < in->altura - prop/4; j++)
+                for (int k = prop/10; k < in->largura - prop/10; k++)
+                    out->dados[i][j-prop/4][k-prop/10] = in->dados[i][j][k];
+    }
 }
