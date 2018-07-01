@@ -30,12 +30,13 @@ int main(){
     //centro = atribuiImagemCinza(original);
 
     centro = restringeCentro(original);
+    salvaImagem(centro, "../resultados/Centro.png");
     
     // IDEIA OPCIONAL:
     // Podemos usar rotulação de componentes conexos para restringir melhor
     //o local onde fica o AL Code!
     code = restringeFloodFill(centro);
-    salvaImagem(code, "../resultados/code.png");
+    salvaImagem(code, "../resultados/Code.png");
     
     rotacionada = rotaciona(code);
     
@@ -115,7 +116,6 @@ Imagem *restringeFloodFill (Imagem *centro) {
             for (int i = 0; i < ALres->largura; i++)
                 ALres->dados[k][j][i] = centro->dados[k][j+maiorComp.roi.c][i+maiorComp.roi.e];
 
-    salvaImagem(centro, "../resultados/Teste.png");
     destroiImagem(cinza);
     free (componentes);
     return ALres;
@@ -128,10 +128,7 @@ Imagem *rotaciona(Imagem *in) {
 }
 
 void decodifica(Imagem *in){
-
-}
-
-/*
+    /*
     Imagem *img;
     img = abreImagem("../resultados/ALCode.png",1);
     if(!img){
@@ -156,3 +153,4 @@ void decodifica(Imagem *in){
     }
     destroiImagem(img);
 */
+}
