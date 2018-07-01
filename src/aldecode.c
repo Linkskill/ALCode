@@ -23,56 +23,27 @@ int main(){
     por meio de um threshold 
     */
 
-    Imagem *original, *aux, *ALres, *cinza;
+    Imagem *original, *centro, *code, *rotacionada;
 
-    original = abreImagem("../imagens/HorizontalCentro.bmp",3);
+    original = abreImagem("../imagens/VerticalTorta.bmp",3);
 
-    //aux = atribuiImagemCinza(original);
+    //centro = atribuiImagemCinza(original);
 
-    aux = restringeCentro(original);
-
-    cinza = atribuiImagemCinza(aux);
-
+    centro = restringeCentro(original);
+    
     // IDEIA OPCIONAL:
     // Podemos usar rotulação de componentes conexos para restringir melhor
     //o local onde fica o AL Code!
+    code = restringeFloodFill(centro);
+    salvaImagem(code, "../resultados/code.png");
     
-    Imagem *rotulo;
-    rotulo = criaImagem(aux->largura, aux->altura, aux->n_canais);
+    rotacionada = rotaciona(code);
+    
+    decodifica(rotacionada);
 
-    ComponenteConexo* componentes, maiorComp;
-    int n_componentes, maiorCoordX = 0, maiorCoordY = 0;
-    n_componentes = rotulaFloodFill (cinza, &componentes, 4, 4, 16);
-
-    printf ("%d componentes detectados.\n", n_componentes);
-
-    for (int i = 0; i < n_componentes; i++){
-        desenhaRetangulo (componentes [i].roi, criaCor (1,1,1), rotulo);
-        if(maiorCoordY < componentes[i].roi.b-componentes[i].roi.c
-                && maiorCoordX < componentes[i].roi.d-componentes[i].roi.e) {
-            maiorCoordY = componentes[i].roi.b-componentes[i].roi.c;
-            maiorCoordX = componentes[i].roi.d-componentes[i].roi.e;
-            maiorComp = componentes[i];
-        }
-    }
-
-    salvaImagem (rotulo, "../resultados/Rotulo.bmp");
-
-    ALres = criaImagem(maiorComp.roi.d - maiorComp.roi.e,
-                        maiorComp.roi.b - maiorComp.roi.c,3);
-
-    for (int k = 0; k < ALres->n_canais; k++)
-        for (int j = 0; j < ALres->altura; j++)
-            for (int i = 0; i < ALres->largura; i++)
-                ALres->dados[k][j][i] = aux->dados[k][j+maiorComp.roi.c][i+maiorComp.roi.e];
-
-    salvaImagem(aux, "../resultados/Teste.png");
-    salvaImagem(ALres, "../resultados/ALRes.png");
-    destroiImagem(ALres);
+    destroiImagem(code);
     destroiImagem(original);
-    destroiImagem(aux);
-    destroiImagem(cinza);
-    free (componentes);
+    destroiImagem(centro);
     return 0;
 }
 
@@ -111,6 +82,54 @@ Imagem *atribuiImagemCinza(Imagem *in){
     return out;
 }
 
+Imagem *restringeFloodFill (Imagem *centro) {
+    Imagem *ALres, *cinza, *rotulo;
+
+    cinza = atribuiImagemCinza(centro);
+    
+    rotulo = criaImagem(centro->largura, centro->altura, centro->n_canais);
+
+    ComponenteConexo* componentes, maiorComp;
+    int n_componentes, maiorCoordX = 0, maiorCoordY = 0;
+    n_componentes = rotulaFloodFill (cinza, &componentes, 4, 4, 16);
+
+    printf ("%d componentes detectados.\n", n_componentes);
+
+    for (int i = 0; i < n_componentes; i++){
+        desenhaRetangulo (componentes [i].roi, criaCor (1,1,1), rotulo);
+        if(maiorCoordY < componentes[i].roi.b-componentes[i].roi.c
+                && maiorCoordX < componentes[i].roi.d-componentes[i].roi.e) {
+            maiorCoordY = componentes[i].roi.b-componentes[i].roi.c;
+            maiorCoordX = componentes[i].roi.d-componentes[i].roi.e;
+            maiorComp = componentes[i];
+        }
+    }
+
+    salvaImagem (rotulo, "../resultados/Rotulo.bmp");
+
+    ALres = criaImagem(maiorComp.roi.d - maiorComp.roi.e,
+                        maiorComp.roi.b - maiorComp.roi.c,3);
+
+    for (int k = 0; k < ALres->n_canais; k++)
+        for (int j = 0; j < ALres->altura; j++)
+            for (int i = 0; i < ALres->largura; i++)
+                ALres->dados[k][j][i] = centro->dados[k][j+maiorComp.roi.c][i+maiorComp.roi.e];
+
+    salvaImagem(centro, "../resultados/Teste.png");
+    destroiImagem(cinza);
+    free (componentes);
+    return ALres;
+}
+
+Imagem *rotaciona(Imagem *in) {
+
+
+
+}
+
+void decodifica(Imagem *in){
+
+}
 
 /*
     Imagem *img;
