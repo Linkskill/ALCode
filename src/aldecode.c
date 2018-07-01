@@ -25,7 +25,7 @@ int main(){
 
     Imagem *original, *centro, *code, *rotacionada;
 
-    original = abreImagem("../imagens/VerticalTorta.bmp",3);
+    original = abreImagem("../imagens/HorizontalCentro.bmp",3);
 
     //centro = atribuiImagemCinza(original);
 
@@ -39,7 +39,8 @@ int main(){
     salvaImagem(code, "../resultados/Code.png");
     
     rotacionada = rotaciona(code);
-    
+    salvaImagem(rotacionada, "../resultados/Rotacionada.png");
+
     decodifica(rotacionada);
 
     destroiImagem(code);
@@ -122,9 +123,39 @@ Imagem *restringeFloodFill (Imagem *centro) {
 }
 
 Imagem *rotaciona(Imagem *in) {
+    Imagem *out;
 
+    int cont, achou = 0;
+    out = criaImagem(in->largura, in->altura, in->n_canais);
+    copiaConteudo(in,out);
 
+    for (int i = 0; i < out->n_canais; i++){
+        for (int j = 0; j < out->altura; j += in->largura/32){
+            for (int k = 0; k < out->largura - 6*in->largura/32; k += in->largura/32){
+                cont = 0;
+                if(out->dados[i][j][k + 0*in->largura/32] < 0.5f 
+                        && out->dados[i][j][k + 2*in->largura/32] < 0.5f 
+                        && out->dados[i][j][k + 3*in->largura/32] < 0.5f 
+                        && out->dados[i][j][k + 4*in->largura/32] < 0.5f
+                        && out->dados[i][j][k + 6*in->largura/32] < 0.5f)
+                    cont += 5;
+                if (out->dados[i][j][k + in->largura/32] > 0.5f
+                        && out->dados[i][j][k + 5*in->largura/32] > 0.5f)
+                    cont += 2;
 
+                if(cont == 7){
+                    achou++;
+                    out->dados[0][j][k] = 0.0f;
+                    out->dados[1][j][k] = 1.0f;
+                    out->dados[2][j][k] = 1.0f;
+                }
+            }
+        }
+    }
+
+    printf("Achou: %d padroes!\n", achou);
+
+    return out;
 }
 
 void decodifica(Imagem *in){
