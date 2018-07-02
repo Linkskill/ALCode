@@ -126,21 +126,74 @@ Imagem *rotaciona(Imagem *in) {
     Imagem *out;
 
     int cont, achou = 0;
+    int passos = in->largura/32; 
+    int posHX[12], posHY[12];
     out = criaImagem(in->largura, in->altura, in->n_canais);
     copiaConteudo(in,out);
 
     for (int i = 0; i < out->n_canais; i++){
-        for (int j = 0; j < out->altura; j += in->largura/32){
-            for (int k = 0; k < out->largura - 6*in->largura/32; k += in->largura/32){
+        for (int j = 0; j < out->altura; j += passos){
+            for (int k = 0; k < out->largura - 6*passos; k += passos){
                 cont = 0;
-                if(out->dados[i][j][k + 0*in->largura/32] < 0.5f 
-                        && out->dados[i][j][k + 2*in->largura/32] < 0.5f 
-                        && out->dados[i][j][k + 3*in->largura/32] < 0.5f 
-                        && out->dados[i][j][k + 4*in->largura/32] < 0.5f
-                        && out->dados[i][j][k + 6*in->largura/32] < 0.5f)
+                if(out->dados[i][j][k + 0*passos] < 0.5f 
+                        && out->dados[i][j][k + 2*passos] < 0.5f 
+                        && out->dados[i][j][k + 3*passos] < 0.5f 
+                        && out->dados[i][j][k + 4*passos] < 0.5f
+                        && out->dados[i][j][k + 6*passos] < 0.5f)
                     cont += 5;
-                if (out->dados[i][j][k + in->largura/32] > 0.5f
-                        && out->dados[i][j][k + 5*in->largura/32] > 0.5f)
+                if (out->dados[i][j][k + passos] > 0.5f
+                        && out->dados[i][j][k + 5*passos] > 0.5f)
+                    cont += 2;
+
+                if(cont == 7){
+                    posHX[achou] = k;
+                    posHY[achou] = j;
+                    achou++;
+                    out->dados[0][j][k] = 0.0f;
+                    out->dados[1][j][k] = 1.0f;
+                    out->dados[2][j][k] = 1.0f;
+                }
+            }
+        }
+    }
+    for (int i = 0; i < achou; i++)
+        printf("posX(%d) = %d\nposY(%d) = %d\n", i, posHX[i], i, posHY[i]);
+    /*for (int i = 0; i < out->n_canais; i++){
+        for (int j = 0; j < out->largura; j += passos){
+            for (int k = 0; k < out->altura - 6*passos; k += passos){
+                cont = 0;
+                if(out->dados[i][k + 0*passos][j] < 0.5f 
+                        && out->dados[i][k + 2*passos][j] < 0.5f 
+                        && out->dados[i][k + 3*passos][j] < 0.5f 
+                        && out->dados[i][k + 4*passos][j] < 0.5f
+                        && out->dados[i][k + 6*passos][j] < 0.5f)
+                    cont += 5;
+                if (out->dados[i][k + passos][j] > 0.5f
+                        && out->dados[i][k + 5*passos][j] > 0.5f)
+                    cont += 2;
+
+                if(cont == 7){
+                    achou++;
+                    out->dados[0][k][j] = 0.0f;
+                    out->dados[1][k][j] = 1.0f;
+                    out->dados[2][k][j] = 1.0f;
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < out->n_canais; i++){
+        for (int j = 0; j < out->altura - 6*passos; j += passos){
+            for (int k = 0; k < out->largura - 6*passos; k += passos){
+                cont = 0;
+                if(out->dados[i][j + 0*passos][k + 0*passos] < 0.5f 
+                        && out->dados[i][j + 2*passos][k + 2*passos] < 0.5f 
+                        && out->dados[i][j + 3*passos][k + 3*passos] < 0.5f 
+                        && out->dados[i][j + 4*passos][k + 4*passos] < 0.5f
+                        && out->dados[i][j + 6*passos][k + 6*passos] < 0.5f)
+                    cont += 5;
+                if (out->dados[i][j + passos][k + passos] > 0.5f
+                        && out->dados[i][j + 5*passos][k + 5*passos] > 0.5f)
                     cont += 2;
 
                 if(cont == 7){
@@ -151,7 +204,7 @@ Imagem *rotaciona(Imagem *in) {
                 }
             }
         }
-    }
+    }*/
 
     printf("Achou: %d padroes!\n", achou);
 
