@@ -72,12 +72,12 @@ Imagem *restringeCentro(Imagem *in){
     return out;
 }
 
-Imagem *atribuiImagemCinza(Imagem *in){
+Imagem *atribuiImagemCinza(Imagem *in, float limiar){
     Imagem *out;
     out = criaImagem(in->largura, in->altura, 1);
     for (int j = 0; j < in->altura; j++)
         for (int k = 0; k < in->largura; k++)
-            if ((in->dados[0][j][k] + in->dados[1][j][k] + in->dados[2][j][k])/3 > 0.5f)
+            if ((0.299f * in->dados[0][j][k] + 0.587f * in->dados[1][j][k] + 0.114f * in->dados[2][j][k]) > limiar)
                 out->dados[0][j][k] = 1.0f;
             else
                 out->dados[0][j][k] = 0.0f;
@@ -87,7 +87,8 @@ Imagem *atribuiImagemCinza(Imagem *in){
 Imagem *restringeFloodFill (Imagem *centro) {
     Imagem *ALres, *cinza, *rotulo;
 
-    cinza = atribuiImagemCinza(centro);
+    cinza = atribuiImagemCinza(centro, 0.5f);
+    salvaImagem(cinza, "../resultados/teste.bmp");
     
     rotulo = criaImagem(centro->largura, centro->altura, centro->n_canais);
 
@@ -98,7 +99,11 @@ Imagem *restringeFloodFill (Imagem *centro) {
     printf ("%d componentes detectados.\n", n_componentes);
 
     for (int i = 0; i < n_componentes; i++){
-        desenhaRetangulo (componentes [i].roi, criaCor (1,1,1), rotulo);
+        printf("baixo - cima: %d\n", componentes[i].roi.b - componentes[i].roi.c);
+        printf("direita - esquerda: %d\n", componentes[i].roi.d - componentes[i].roi.e);
+        printf("diferença: %f\n\n", (float)(componentes[i].roi.b - componentes[i].roi.c)/(float)(componentes[i].roi.d - componentes[i].roi.e));
+        if((float)(componentes[i].roi.b - componentes[i].roi.c)/(float)(componentes[i].roi.d - componentes[i].roi.e) < 1.3f && (float)(componentes[i].roi.b - componentes[i].roi.c)/(float)(componentes[i].roi.d - componentes[i].roi.e) > 0.7f)
+            desenhaRetangulo (componentes [i].roi, criaCor (1,0,0), rotulo);
         if(maiorCoordY < componentes[i].roi.b-componentes[i].roi.c
                 && maiorCoordX < componentes[i].roi.d-componentes[i].roi.e) {
             maiorCoordY = componentes[i].roi.b-componentes[i].roi.c;

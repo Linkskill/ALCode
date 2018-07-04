@@ -5,7 +5,7 @@
 #include "alcode.h"
 
 Imagem *restringeCentro(Imagem *in);
-Imagem *atribuiImagemCinza(Imagem *in);
+Imagem *atribuiImagemCinza(Imagem *in, float limiar);
 Imagem *restringeFloodFill (Imagem *centro);
 Imagem *rotaciona(Imagem *in);
 void decodifica(Imagem *in);
