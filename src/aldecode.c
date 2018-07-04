@@ -23,19 +23,23 @@ int main(){
     por meio de um threshold 
     */
 
-    Imagem *original, *centro, *code, *rotacionada;
+    Imagem *original, *centro, *code, *rotacionada, *binarizada;
 
     original = abreImagem("../imagens/HorizontalCentro.bmp",3);
 
     //centro = atribuiImagemCinza(original);
 
+//    centro = criaImagem(original->largura,original->altura,original->n_canais);
+//    copiaConteudo(original,centro);
     centro = restringeCentro(original);
     salvaImagem(centro, "../resultados/Centro.png");
-    
+
+    binarizada = atribuiImagemCinza(centro);
+    salvaImagem(binarizada, "../resultados/Binarizada.png");
     // IDEIA OPCIONAL:
     // Podemos usar rotulação de componentes conexos para restringir melhor
     //o local onde fica o AL Code!
-    code = restringeFloodFill(centro);
+    code = restringeFloodFill(binarizada);
     salvaImagem(code, "../resultados/Code.png");
     
     rotacionada = rotaciona(code);
@@ -43,9 +47,11 @@ int main(){
 
     decodifica(rotacionada);
 
-    destroiImagem(code);
     destroiImagem(original);
     destroiImagem(centro);
+    destroiImagem(binarizada);
+    destroiImagem(code);
+    destroiImagem(rotacionada);
     return 0;
 }
 
@@ -84,21 +90,23 @@ Imagem *atribuiImagemCinza(Imagem *in){
     return out;
 }
 
-Imagem *restringeFloodFill (Imagem *centro) {
-    Imagem *ALres, *cinza, *rotulo;
+Imagem *restringeFloodFill (Imagem *in) {
+    Imagem *ALres, *auxiliar, *rotulo;
 
-    cinza = atribuiImagemCinza(centro);
+    auxiliar = criaImagem(in->largura, in->altura, in->n_canais);
+    copiaConteudo(in,auxiliar);
+//    auxiliar = atribuiImagemCinza(in);
     
-    rotulo = criaImagem(centro->largura, centro->altura, centro->n_canais);
+    rotulo = criaImagem(auxiliar->largura, auxiliar->altura, auxiliar->n_canais);
 
     ComponenteConexo* componentes, maiorComp;
     int n_componentes, maiorCoordX = 0, maiorCoordY = 0;
-    n_componentes = rotulaFloodFill (cinza, &componentes, 4, 4, 16);
+    n_componentes = rotulaFloodFill (auxiliar, &componentes, 4, 4, 16);
 
     printf ("%d componentes detectados.\n", n_componentes);
 
     for (int i = 0; i < n_componentes; i++){
-        desenhaRetangulo (componentes [i].roi, criaCor (1,1,1), rotulo);
+        desenhaRetangulo (componentes [i].roi, criaCor (1,0,0), rotulo);
         if(maiorCoordY < componentes[i].roi.b-componentes[i].roi.c
                 && maiorCoordX < componentes[i].roi.d-componentes[i].roi.e) {
             maiorCoordY = componentes[i].roi.b-componentes[i].roi.c;
@@ -110,14 +118,13 @@ Imagem *restringeFloodFill (Imagem *centro) {
     salvaImagem (rotulo, "../resultados/Rotulo.bmp");
 
     ALres = criaImagem(maiorComp.roi.d - maiorComp.roi.e,
-                        maiorComp.roi.b - maiorComp.roi.c,3);
+                        maiorComp.roi.b - maiorComp.roi.c, 1);
 
-    for (int k = 0; k < ALres->n_canais; k++)
-        for (int j = 0; j < ALres->altura; j++)
-            for (int i = 0; i < ALres->largura; i++)
-                ALres->dados[k][j][i] = centro->dados[k][j+maiorComp.roi.c][i+maiorComp.roi.e];
+    for (int j = 0; j < ALres->altura; j++)
+        for (int i = 0; i < ALres->largura; i++)
+            ALres->dados[0][j][i] = in->dados[0][j+maiorComp.roi.c][i+maiorComp.roi.e];
 
-    destroiImagem(cinza);
+    destroiImagem(auxiliar);
     free (componentes);
     return ALres;
 }
@@ -128,85 +135,113 @@ Imagem *rotaciona(Imagem *in) {
     int cont, achou = 0;
     int passos = in->largura/32; 
     int posHX[12], posHY[12];
+    int posVX[12], posVY[12];
     out = criaImagem(in->largura, in->altura, in->n_canais);
     copiaConteudo(in,out);
 
-    for (int i = 0; i < out->n_canais; i++){
-        for (int j = 0; j < out->altura; j += passos){
-            for (int k = 0; k < out->largura - 6*passos; k += passos){
-                cont = 0;
-                if(out->dados[i][j][k + 0*passos] < 0.5f 
-                        && out->dados[i][j][k + 2*passos] < 0.5f 
-                        && out->dados[i][j][k + 3*passos] < 0.5f 
-                        && out->dados[i][j][k + 4*passos] < 0.5f
-                        && out->dados[i][j][k + 6*passos] < 0.5f)
-                    cont += 5;
-                if (out->dados[i][j][k + passos] > 0.5f
-                        && out->dados[i][j][k + 5*passos] > 0.5f)
-                    cont += 2;
+    // Percorre horizontalmente da esquerda para a direita (de cima para baixo)
+    for (int j = 0; j < out->altura; j += passos){
+        for (int k = 0; k < out->largura - 6*passos; k += passos){
+            cont = 0;
+            if(out->dados[0][j][k + 0*passos] < 0.5f 
+                    && out->dados[0][j][k + 2*passos] < 0.5f 
+                    && out->dados[0][j][k + 3*passos] < 0.5f 
+                    && out->dados[0][j][k + 4*passos] < 0.5f
+                    && out->dados[0][j][k + 6*passos] < 0.5f)
+                cont += 5;
+            if (out->dados[0][j][k + passos] > 0.5f
+                    && out->dados[0][j][k + 5*passos] > 0.5f)
+                cont += 2;
 
-                if(cont == 7){
-                    posHX[achou] = k;
-                    posHY[achou] = j;
-                    achou++;
-                    out->dados[0][j][k] = 0.0f;
-                    out->dados[1][j][k] = 1.0f;
-                    out->dados[2][j][k] = 1.0f;
-                }
+            if(cont == 7){
+                posHX[achou] = k;
+                posHY[achou] = j;
+                achou++;
+                out->dados[0][j][k] = 1.0f;
             }
         }
     }
+
     for (int i = 0; i < achou; i++)
-        printf("posX(%d) = %d\nposY(%d) = %d\n", i, posHX[i], i, posHY[i]);
-    /*for (int i = 0; i < out->n_canais; i++){
-        for (int j = 0; j < out->largura; j += passos){
-            for (int k = 0; k < out->altura - 6*passos; k += passos){
-                cont = 0;
-                if(out->dados[i][k + 0*passos][j] < 0.5f 
-                        && out->dados[i][k + 2*passos][j] < 0.5f 
-                        && out->dados[i][k + 3*passos][j] < 0.5f 
-                        && out->dados[i][k + 4*passos][j] < 0.5f
-                        && out->dados[i][k + 6*passos][j] < 0.5f)
-                    cont += 5;
-                if (out->dados[i][k + passos][j] > 0.5f
-                        && out->dados[i][k + 5*passos][j] > 0.5f)
-                    cont += 2;
+        printf("Horizontal: posX(%d) = %d\nposY(%d) = %d\n", i, posHX[i], i, posHY[i]);
+    
+    // Percorre verticalmente de cima para baixo (da esquerda para direita)
+    achou = 0;
+    for (int j = posHX[0]; j < out->largura; j += passos){
+        for (int k = posHY[0]; k < out->altura - 6*passos; k += passos){
+            cont = 0;
+            if(out->dados[0][k + 0*passos][j] < 0.5f 
+                    && out->dados[0][k + 2*passos][j] < 0.5f 
+                    && out->dados[0][k + 3*passos][j] < 0.5f 
+                    && out->dados[0][k + 4*passos][j] < 0.5f
+                    && out->dados[0][k + 6*passos][j] < 0.5f)
+                cont += 5;
+            if (out->dados[0][k + passos][j] > 0.5f
+                    && out->dados[0][k + 5*passos][j] > 0.5f)
+                cont += 2;
 
-                if(cont == 7){
-                    achou++;
-                    out->dados[0][k][j] = 0.0f;
-                    out->dados[1][k][j] = 1.0f;
-                    out->dados[2][k][j] = 1.0f;
-                }
+            if(cont == 7){
+                posVX[achou] = j;
+                posVY[achou] = k;
+                achou++;
+                out->dados[0][k][j] = 1.0f;
             }
         }
     }
 
-    for (int i = 0; i < out->n_canais; i++){
-        for (int j = 0; j < out->altura - 6*passos; j += passos){
-            for (int k = 0; k < out->largura - 6*passos; k += passos){
-                cont = 0;
-                if(out->dados[i][j + 0*passos][k + 0*passos] < 0.5f 
-                        && out->dados[i][j + 2*passos][k + 2*passos] < 0.5f 
-                        && out->dados[i][j + 3*passos][k + 3*passos] < 0.5f 
-                        && out->dados[i][j + 4*passos][k + 4*passos] < 0.5f
-                        && out->dados[i][j + 6*passos][k + 6*passos] < 0.5f)
-                    cont += 5;
-                if (out->dados[i][j + passos][k + passos] > 0.5f
-                        && out->dados[i][j + 5*passos][k + 5*passos] > 0.5f)
-                    cont += 2;
+    for (int i = 0; i < achou; i++)
+        printf("Vertical: posX(%d) = %d\nposY(%d) = %d\n", i, posVX[i], i, posVY[i]);
 
-                if(cont == 7){
-                    achou++;
-                    out->dados[0][j][k] = 0.0f;
-                    out->dados[1][j][k] = 1.0f;
-                    out->dados[2][j][k] = 1.0f;
-                }
+
+    // Percorre verticalmente de baixo para cima (da esquerda para direita)
+/*    achou = 0;
+    for (int j = posVX[0]; j < out->largura; j += passos){
+        for (int k = posVY[0]; k < out->altura - 6*passos; k += passos){
+            cont = 0;
+            if(out->dados[0][k + 0*passos][j] < 0.5f 
+                    && out->dados[0][k + 2*passos][j] < 0.5f 
+                    && out->dados[0][k + 3*passos][j] < 0.5f 
+                    && out->dados[0][k + 4*passos][j] < 0.5f
+                    && out->dados[0][k + 6*passos][j] < 0.5f)
+                cont += 5;
+            if (out->dados[0][k + passos][j] > 0.5f
+                    && out->dados[0][k + 5*passos][j] > 0.5f)
+                cont += 2;
+
+            if(cont == 7){
+                posVX[achou] = j;
+                posVY[achou] = k;
+                achou++;
+                out->dados[0][k][j] = 1.0f;
             }
         }
-    }*/
+    }
 
-    printf("Achou: %d padroes!\n", achou);
+    for (int i = 0; i < achou; i++)
+        printf("Vertical: posX(%d) = %d\nposY(%d) = %d\n", i, posVX[i], i, posVY[i]);
+
+*/
+/*
+    for (int j = 0; j < out->altura - 6*passos; j += passos){
+        for (int k = 0; k < out->largura - 6*passos; k += passos){
+            cont = 0;
+            if(out->dados[0][j + 0*passos][k + 0*passos] < 0.5f 
+                    && out->dados[0][j + 2*passos][k + 2*passos] < 0.5f 
+                    && out->dados[0][j + 3*passos][k + 3*passos] < 0.5f 
+                    && out->dados[0][j + 4*passos][k + 4*passos] < 0.5f
+                    && out->dados[0][j + 6*passos][k + 6*passos] < 0.5f)
+                cont += 5;
+            if (out->dados[0][j + passos][k + passos] > 0.5f
+                    && out->dados[0][j + 5*passos][k + 5*passos] > 0.5f)
+                cont += 2;
+
+            if(cont == 7){
+                achou++;
+                out->dados[0][j][k] = 1.0f;
+            }
+        }
+    }
+*/
 
     return out;
 }

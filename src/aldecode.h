@@ -6,7 +6,7 @@
 
 Imagem *restringeCentro(Imagem *in);
 Imagem *atribuiImagemCinza(Imagem *in);
-Imagem *restringeFloodFill (Imagem *centro);
+Imagem *restringeFloodFill (Imagem *in);
 Imagem *rotaciona(Imagem *in);
 void decodifica(Imagem *in);
 

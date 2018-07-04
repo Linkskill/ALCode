@@ -14,8 +14,8 @@
 
 int main () {
 	
-	char *nome = {"../resultados/ALCode.png"};
-	char *nomeP = {"../resultados/ALCPic.png"};
+	char *nome = {"../resultados/ALCode.bmp"};
+	char *nomeP = {"../resultados/ALCPic.bmp"};
 	blocks *binaryMessage;
 	int bsize;
 	bsize = messageToBinary(&binaryMessage, "abcdefghijklmnopqrstuvwxyz");
