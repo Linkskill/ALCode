@@ -9,5 +9,6 @@ Imagem *atribuiImagemCinza(Imagem *in, float limiar);
 Imagem *restringeFloodFill (Imagem *centro);
 Imagem *rotaciona(Imagem *in);
 void decodifica(Imagem *in, int posX, int posY, int passo);
+void binaryToDecimal(blocks **b, int size);
 
 #endif

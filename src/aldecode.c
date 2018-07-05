@@ -38,8 +38,8 @@ int main(){
     code = restringeFloodFill(centro);
     salvaImagem(code, "../resultados/Code.png");
     
-    rotacionada = rotaciona(code);
-    salvaImagem(rotacionada, "../resultados/Rotacionada.png");
+    //rotacionada = rotaciona(code);
+    //salvaImagem(rotacionada, "../resultados/Rotacionada.png");
 
     //decodifica(rotacionada);
 
@@ -47,6 +47,26 @@ int main(){
     destroiImagem(original);
     destroiImagem(centro);
     return 0;
+}
+
+/*  
+	void binaryToDecimal(blocks **b, int size)
+
+	Função para ser utilizada após decodificação, onde cada bloco apenas
+	contém o valor binário. Transforma o vetor (valor binário) em decimal.
+*/
+void binaryToDecimal(blocks **b, int size) {
+	int base;
+	for(int i = 0; i < size; i += 1) {
+		((*b)[i]).decimalValue = 0;
+		base = 128;
+		for(int cont = 0; cont < 8; cont += 1) {
+			if(((*b)[i]).binaryValue[cont] == true) {
+				((*b)[i]).decimalValue += base;
+			}
+			base /= 2;
+		}
+	}
 }
 
 
@@ -99,9 +119,9 @@ Imagem *restringeFloodFill (Imagem *centro) {
     printf ("%d componentes detectados.\n", n_componentes);
 
     for (int i = 0; i < n_componentes; i++){
-        printf("baixo - cima: %d\n", componentes[i].roi.b - componentes[i].roi.c);
-        printf("direita - esquerda: %d\n", componentes[i].roi.d - componentes[i].roi.e);
-        printf("diferença: %f\n\n", (float)(componentes[i].roi.b - componentes[i].roi.c)/(float)(componentes[i].roi.d - componentes[i].roi.e));
+        //printf("baixo - cima: %d\n", componentes[i].roi.b - componentes[i].roi.c);
+        //printf("direita - esquerda: %d\n", componentes[i].roi.d - componentes[i].roi.e);
+        //printf("diferença: %f\n\n", (float)(componentes[i].roi.b - componentes[i].roi.c)/(float)(componentes[i].roi.d - componentes[i].roi.e));
         if((float)(componentes[i].roi.b - componentes[i].roi.c)/(float)(componentes[i].roi.d - componentes[i].roi.e) < 1.3f && (float)(componentes[i].roi.b - componentes[i].roi.c)/(float)(componentes[i].roi.d - componentes[i].roi.e) > 0.7f)
             desenhaRetangulo (componentes [i].roi, criaCor (1,0,0), rotulo);
         if(maiorCoordY < componentes[i].roi.b-componentes[i].roi.c
@@ -113,7 +133,7 @@ Imagem *restringeFloodFill (Imagem *centro) {
     }
 
     printf("area de cada quadrado: %d\n", ((maiorComp.roi.b - maiorComp.roi.c) * (maiorComp.roi.d - maiorComp.roi.e)) / (32 * 32));
-    printf("area de cada quadrado: %d\n", ((componentes[1].roi.b - componentes[1].roi.c) * (componentes[1].roi.d - componentes[1].roi.e))/25);
+    //printf("area de cada quadrado: %d\n", ((componentes[1].roi.b - componentes[1].roi.c) * (componentes[1].roi.d - componentes[1].roi.e))/25);
     printf("pixels por quadrado (cima para baixo): %d\n", ((componentes[1].roi.b - componentes[1].roi.c) / 5));
     printf("pixels por quadrado (esquerda para direita): %d\n", ((componentes[1].roi.d - componentes[1].roi.e) / 5));
     int passo = (componentes[1].roi.d - componentes[1].roi.e) / 5;
