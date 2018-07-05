@@ -134,8 +134,8 @@ Imagem *rotaciona(Imagem *in) {
 
     int cont, achouV = 0, achouH = 0;
     int passos = in->largura/32; 
-    int posHX[4], posHY[4];
-    int posHXI[4], posHYI[4];
+    int posHX[12], posHY[12];
+    int posHXI[12], posHYI[12];
     int posVX[12], posVY[12];
     int posVXI[12], posVYI[12];
     int centroV = 0, centroH = 0;
@@ -261,7 +261,51 @@ Imagem *rotaciona(Imagem *in) {
         printf("Horizontal: posX(%d) = %d\nposY(%d) = %d\n", i, posHXI[i], i, posHYI[i]);
     }
 
-    for (int i = 0; i < achouV; i++){
+    int indice;
+
+    if(achouH > achouV) 
+        indice = achouH;
+    else 
+        indice = achouV;
+
+    for (int k = 0; k < indice; k++){
+        cont = 0;
+        if(out->dados[0][posVY[k]][posHX[k]] < 0.5f 
+                && out->dados[0][posVY[k] + 2*passos][posHX[k] + 2*passos] < 0.5f
+                && out->dados[0][posVY[k] + 3*passos][posHX[k] + 3*passos] < 0.5f
+                && out->dados[0][posVY[k] + 4*passos][posHX[k] + 4*passos] < 0.5f
+                && out->dados[0][posVY[k] + 6*passos][posHX[k] + 6*passos] < 0.5f)
+            cont += 5;
+        if(out->dados[0][posVY[k] + passos][posHX[k] + passos] > 0.5f
+                && out->dados[0][posVY[k] + 5*passos][posHX[k] + 5*passos] > 0.5f)
+            cont += 2;
+        
+        if(cont == 7){
+            out->dados[0][posVY[k] + 3*passos][posHX[k] + 3*passos] = 1.0f;
+            centroH = posHX[k] + 3*passos;
+            centroV = posVY[k] + 3*passos;
+        }
+    }
+
+    for (int k = 0; k < indice; k++){
+        cont = 0;
+        if(out->dados[0][posVYI[k]][posHXI[k]] < 0.5f 
+                && out->dados[0][posVYI[k] - 2*passos][posHXI[k] - 2*passos] < 0.5f
+                && out->dados[0][posVYI[k] - 3*passos][posHXI[k] - 3*passos] < 0.5f
+                && out->dados[0][posVYI[k] - 4*passos][posHXI[k] - 4*passos] < 0.5f
+                && out->dados[0][posVYI[k] - 6*passos][posHXI[k] - 6*passos] < 0.5f)
+            cont += 5;
+        if(out->dados[0][posVYI[k] - passos][posHXI[k] - passos] > 0.5f
+                && out->dados[0][posVYI[k] - 5*passos][posHXI[k] - 5*passos] > 0.5f)
+            cont += 2;
+        
+        if(cont == 7){
+            out->dados[0][posVYI[k] - 3*passos][posHXI[k] - 3*passos] = 1.0f;
+            centroH = (centroH + posHXI[k] + 3*passos)/2;
+            centroV = (centroV + posVYI[k] + 3*passos)/2;
+        }
+    }
+    /*for (int i = 0; i < achouV; i++){
         for (int j = 0; j < achouV; j++){
             if (abs(posVX[i] - posVXI[j]) < 20){
                 centroH = (posVX[i] + posVXI[j])/2;
@@ -289,7 +333,7 @@ Imagem *rotaciona(Imagem *in) {
             if(centroH > 0 && centroV > 0)
                 out->dados[0][centroV][centroH] = 1.0f;
         }
-    }
+    }*/
     // checa dentre as coordenadas verticais o centro
 /*    for (int i = 0; i < achouV; i++){
         for (int j = 0; j < achouV; j++){
