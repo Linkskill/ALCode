@@ -138,7 +138,7 @@ Imagem *rotaciona(Imagem *in) {
     int posHXI[12], posHYI[12];
     int posVX[12], posVY[12];
     int posVXI[12], posVYI[12];
-    int centroV = 0, centroH = 0;
+    int centroV[4], centroH[4];
     out = criaImagem(in->largura, in->altura, in->n_canais);
     copiaConteudo(in,out);
 
@@ -263,11 +263,22 @@ Imagem *rotaciona(Imagem *in) {
 
     int indice;
 
+    int posDX[4], posDY[4];
+    int posDXI[4], posDYI[4];
+
+    for (int i = 0; i < 4; i++){
+        posDX[i] = -1;
+        posDXI[i] = -1;
+        posDY[i] = -1;
+        posDYI[i] = -1;
+    }
+
     if(achouH > achouV) 
         indice = achouH;
     else 
         indice = achouV;
 
+    achouH = 0;
     for (int k = 0; k < indice; k++){
         cont = 0;
         if(out->dados[0][posVY[k]][posHX[k]] < 0.5f 
@@ -281,12 +292,14 @@ Imagem *rotaciona(Imagem *in) {
             cont += 2;
         
         if(cont == 7){
-            out->dados[0][posVY[k] + 3*passos][posHX[k] + 3*passos] = 1.0f;
-            centroH = posHX[k] + 3*passos;
-            centroV = posVY[k] + 3*passos;
+            out->dados[0][posVY[k]][posHX[k]] = 1.0f;
+            posDX[achouH] = posHX[k];
+            posDY[achouH] = posVY[k];
+            achouH++;
         }
     }
-
+    
+    achouV = 0;
     for (int k = 0; k < indice; k++){
         cont = 0;
         if(out->dados[0][posVYI[k]][posHXI[k]] < 0.5f 
@@ -300,65 +313,24 @@ Imagem *rotaciona(Imagem *in) {
             cont += 2;
         
         if(cont == 7){
-            out->dados[0][posVYI[k] - 3*passos][posHXI[k] - 3*passos] = 1.0f;
-            centroH = (centroH + posHXI[k] + 3*passos)/2;
-            centroV = (centroV + posVYI[k] + 3*passos)/2;
+            out->dados[0][posVYI[k]][posHXI[k]] = 1.0f;
+            posDXI[achouV] = posHXI[k];
+            posDYI[achouV] = posVYI[k];
+            achouV++;
         }
-    }
-    /*for (int i = 0; i < achouV; i++){
-        for (int j = 0; j < achouV; j++){
-            if (abs(posVX[i] - posVXI[j]) < 20){
-                centroH = (posVX[i] + posVXI[j])/2;
-                centroV = (posVY[i] + posVYI[j])/2;
-            }
-            else if (abs(posVY[i] - posVYI[j]) < 20){
-                centroH = (posVX[i] + posVXI[j])/2;
-                centroV = (posVY[i] + posVYI[j])/2;
-            }
-            if(centroH > 0 && centroV > 0)
-                out->dados[0][centroV][centroH] = 1.0f;
-        }
-    }
+    }   
 
-    for (int i = 0; i < achouH; i++){
-        for (int j = 0; j < achouH; j++){
-            if (abs(posHX[i] - posHXI[j]) < 20){
-                centroH = (posHX[i] + posHXI[j])/2;
-                centroV = (posHY[i] + posHYI[j])/2;
-            }
-            else if (abs(posHY[i] - posHYI[j]) < 20){
-                centroH = (posHX[i] + posHXI[j])/2;
-                centroV = (posHY[i] + posHYI[j])/2;
-            }
-            if(centroH > 0 && centroV > 0)
-                out->dados[0][centroV][centroH] = 1.0f;
-        }
-    }*/
-    // checa dentre as coordenadas verticais o centro
-/*    for (int i = 0; i < achouV; i++){
-        for (int j = 0; j < achouV; j++){
-            if(abs(posVX[i] - posVXI[j]) < 32 && posVYI[j] - posVY[i] > 32
-                    && posVYI[j] - posVY[i] < out->altura/2
-                    && abs(posHX[i] - posHXI[j]) < out->largura/2){
-                centroH = (posHX[i] + posHXI[j])/2;
-                centroV = (posVY[i] + posVYI[j])/2;
-                out->dados[0][centroV][centroH] = 1.0f;
+    for (int k = 0; k < achouH; k++){
+        for (int l = 0; l < achouV; l++){
+            if(abs(posDX[k] - posDXI[l]) < out->largura/2
+                    && abs(posDY[k] - posDYI[l]) < out->altura/2){
+                centroH[cont] = (posDX[k] + posDXI[l])/2;
+                centroV[cont] = (posDY[k] + posDYI[l])/2;
+                out->dados[0][centroV[cont]][centroH[cont]] = 1.0f;
+                cont++;
             }
         }
     }
-
-    // checa dentre as coordenadas horizontais o centro
-    for (int i = 0; i < achouH; i++){
-        for (int j = 0; j < achouH; j++){
-            if(abs(posHY[i] - posHYI[j]) < 32 && posHXI[j] - posHX[i] > 32
-                    && posHXI[j] - posHX[i] < out->largura/2
-                    && abs(posVY[i] - posVYI[j]) < out->altura/2){
-                centroH = (posHX[i] + posHXI[j])/2;
-                centroV = (posVY[i] + posVYI[j])/2;
-                out->dados[0][centroV][centroH] = 1.0f;
-            }
-        }
-    }*/
 
     return out;
 }
