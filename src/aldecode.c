@@ -41,7 +41,7 @@ int main(){
     rotacionada = rotaciona(code);
     salvaImagem(rotacionada, "../resultados/Rotacionada.png");
 
-    decodifica(rotacionada);
+    //decodifica(rotacionada);
 
     destroiImagem(code);
     destroiImagem(original);
@@ -112,7 +112,16 @@ Imagem *restringeFloodFill (Imagem *centro) {
         }
     }
 
+    printf("area de cada quadrado: %d\n", ((maiorComp.roi.b - maiorComp.roi.c) * (maiorComp.roi.d - maiorComp.roi.e)) / (32 * 32));
+    printf("area de cada quadrado: %d\n", ((componentes[1].roi.b - componentes[1].roi.c) * (componentes[1].roi.d - componentes[1].roi.e))/25);
+    printf("pixels por quadrado (cima para baixo): %d\n", ((componentes[1].roi.b - componentes[1].roi.c) / 5));
+    printf("pixels por quadrado (esquerda para direita): %d\n", ((componentes[1].roi.d - componentes[1].roi.e) / 5));
+    int passo = (componentes[1].roi.d - componentes[1].roi.e) / 5;
+    printf("passo: %d\n", passo);
+
     salvaImagem (rotulo, "../resultados/Rotulo.bmp");
+    decodifica(cinza, componentes[1].roi.e + passo * 7, componentes[1].roi.c - passo, passo);
+
 
     ALres = criaImagem(maiorComp.roi.d - maiorComp.roi.e,
                         maiorComp.roi.b - maiorComp.roi.c,3);
@@ -216,30 +225,50 @@ Imagem *rotaciona(Imagem *in) {
     return out;
 }
 
-void decodifica(Imagem *in){
-    /*
-    Imagem *img;
-    img = abreImagem("../resultados/ALCode.png",1);
-    if(!img){
-        printf("No image found!\n");
-        return -1;
-    }
-
-    int mat[img->largura/2][img->altura/2];
-
-    for(int i = 0; i < img->largura/2; i += 1){
-        for(int j = 0; j < img->altura/2; j += 1){
-            if(img->dados[0][i][j] > 0.5f){
-                mat[i][j] = 1;
-                printf("%2d", mat[i][j]);
-            }
-            else{
-                mat[i][j] = 0;
-                printf("%2d", mat[i][j]);
-            }
+void decodifica(Imagem *in, int posX, int posY, int passo) {
+    int branco, preto, block = 0;
+    blocks *mensagem;
+    mensagem = malloc(24 * sizeof(blocks));
+    for(int cont = 0; cont < 3; cont += 1) {
+        if(cont == 1) {
+            //printf("posX: %d posY: %d\n", posX, posY);
+            posX -= passo * 8;            
+            //printf("posX: %d posY: %d\n", posX, posY);
         }
-        printf("\n");
+        if(cont == 2) {
+            //printf("posX: %d posY: %d\n", posX, posY);
+            posX += passo * 8;            
+            posY -= passo * 8;
+            //printf("posX: %d posY: %d\n", posX, posY);            
+        }
+        for(int contY = 0; contY < 8; contY += 1) {
+            for(int contX = 0; contX < 8; contX += 1) {
+                branco = 0;
+                preto = 0;
+                for(int y = posY; y < posY + passo; y += 1) {
+                    for(int x = posX; x < posX + passo; x += 1) {
+                        //printf("pixel[%d][%d]: %f\n", y, x, in->dados[0][y][x]);
+                        if(in->dados[0][y][x] > 0)
+                            branco += 1;
+                        else
+                            preto += 1;
+                    }
+                }
+                /* printf("quantidade branco: %d\n", branco);
+                printf("quantidade preto: %d\n", preto);
+                printf("posX: %d\n", posX);
+                printf("posY: %d\n", posY); */
+                if(branco > preto)
+                    mensagem[block].binaryValue[contX] = true;
+                else
+                    mensagem[block].binaryValue[contX] = false;
+                posX += passo;
+            }
+            block += 1;
+            posX -= passo * 8;
+            posY += passo;
+        }
     }
-    destroiImagem(img);
-*/
+    binaryToDecimal(&mensagem, 24);
+    printBlocks(&mensagem, 24);
 }

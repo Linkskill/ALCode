@@ -37,6 +37,26 @@ int messageToBinary(blocks **b, char *message) {
 }
 
 /*  
+	void binaryToDecimal(blocks **b, int size)
+
+	Função para ser utilizada após decodificação, onde cada bloco apenas
+	contém o valor binário. Transforma o vetor (valor binário) em decimal.
+*/
+void binaryToDecimal(blocks **b, int size) {
+	int base;
+	for(int i = 0; i < size; i += 1) {
+		((*b)[i]).decimalValue = 0;
+		base = 128;
+		for(int cont = 0; cont < 8; cont += 1) {
+			if(((*b)[i]).binaryValue[cont] == true) {
+				((*b)[i]).decimalValue += base;
+			}
+			base /= 2;
+		}
+	}
+}
+
+/*  
 	bool ** initALcode(int ALsize, blocks **b, int bsize)
 
 	Função que retorna a matriz do ALcode dinâmicamente alocada, que é um quarteto da imagem final.
@@ -115,6 +135,8 @@ void printMatrix(bool **matrix, int size) {
 void printBlocks(blocks **b, int size) {
 	if(b) {
 		for(int i = 0; i < size; i += 1) {
+			printf("\n");
+			printf("Char value: %c\n", ((*b)[i]).decimalValue);
 			printf("Decimal value: %d\n", ((*b)[i]).decimalValue);
 			printf("Binary value: ");
 			for(int j = 0; j < 8; j += 1) {

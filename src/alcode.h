@@ -10,6 +10,7 @@ typedef struct {
 
 /** Criação do ALCode **/
 int messageToBinary(blocks **b, char *message);
+void binaryToDecimal(blocks **b, int size);
 bool ** initALcode(int ALsize, blocks **b, int bsize);
 void printMatrix(bool **matrix, int size);
 void printBlocks(blocks **b, int size);

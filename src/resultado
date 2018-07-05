@@ -1,0 +1,145 @@
+5 componentes detectados.
+baixo - cima: 640
+direita - esquerda: 638
+diferença: 1.003135
+
+baixo - cima: 101
+direita - esquerda: 100
+diferença: 1.010000
+
+baixo - cima: 101
+direita - esquerda: 100
+diferença: 1.010000
+
+baixo - cima: 101
+direita - esquerda: 100
+diferença: 1.010000
+
+baixo - cima: 101
+direita - esquerda: 100
+diferença: 1.010000
+
+area de cada quadrado: 398
+area de cada quadrado: 404
+pixels por quadrado (cima para baixo): 20
+pixels por quadrado (esquerda para direita): 20
+passo: 20
+
+Char value: a
+Decimal value: 97
+Binary value: 01100001
+
+Char value: b
+Decimal value: 98
+Binary value: 01100010
+
+Char value: c
+Decimal value: 99
+Binary value: 01100011
+
+Char value: d
+Decimal value: 100
+Binary value: 01100100
+
+Char value: e
+Decimal value: 101
+Binary value: 01100101
+
+Char value: f
+Decimal value: 102
+Binary value: 01100110
+
+Char value: g
+Decimal value: 103
+Binary value: 01100111
+
+Char value: h
+Decimal value: 104
+Binary value: 01101000
+
+Char value: i
+Decimal value: 105
+Binary value: 01101001
+
+Char value: j
+Decimal value: 106
+Binary value: 01101010
+
+Char value: k
+Decimal value: 107
+Binary value: 01101011
+
+Char value: l
+Decimal value: 108
+Binary value: 01101100
+
+Char value: m
+Decimal value: 109
+Binary value: 01101101
+
+Char value: n
+Decimal value: 110
+Binary value: 01101110
+
+Char value: o
+Decimal value: 111
+Binary value: 01101111
+
+Char value: p
+Decimal value: 112
+Binary value: 01110000
+
+Char value: q
+Decimal value: 113
+Binary value: 01110001
+
+Char value: r
+Decimal value: 114
+Binary value: 01110010
+
+Char value: s
+Decimal value: 115
+Binary value: 01110011
+
+Char value: t
+Decimal value: 116
+Binary value: 01110100
+
+Char value: u
+Decimal value: 117
+Binary value: 01110101
+
+Char value: v
+Decimal value: 118
+Binary value: 01110110
+
+Char value: w
+Decimal value: 119
+Binary value: 01110111
+
+Char value: x
+Decimal value: 120
+Binary value: 01111000
+posX(0) = 19
+posY(0) = 57
+posX(1) = 513
+posY(1) = 57
+posX(2) = 19
+posY(2) = 76
+posX(3) = 513
+posY(3) = 76
+posX(4) = 19
+posY(4) = 95
+posX(5) = 513
+posY(5) = 95
+posX(6) = 513
+posY(6) = 551
+posX(7) = 513
+posY(7) = 570
+posX(8) = 513
+posY(8) = 589
+posX(9) = 19
+posY(9) = 551
+posX(10) = 19
+posY(10) = 570
+Achou: 11 padroes!
