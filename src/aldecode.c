@@ -29,9 +29,9 @@ int main(){
 
     //centro = atribuiImagemCinza(original);
 
-//    centro = criaImagem(original->largura,original->altura,original->n_canais);
-//    copiaConteudo(original,centro);
-    centro = restringeCentro(original);
+    centro = criaImagem(original->largura,original->altura,original->n_canais);
+    copiaConteudo(original,centro);
+//    centro = restringeCentro(original);
     salvaImagem(centro, "../resultados/Centro.png");
 
     binarizada = atribuiImagemCinza(centro);
@@ -132,14 +132,77 @@ Imagem *restringeFloodFill (Imagem *in) {
 Imagem *rotaciona(Imagem *in) {
     Imagem *out;
 
-    int cont, achou = 0;
+    int cont, achouV = 0, achouH = 0;
     int passos = in->largura/32; 
-    int posHX[12], posHY[12];
+    int posHX[4], posHY[4];
+    int posHXI[4], posHYI[4];
     int posVX[12], posVY[12];
+    int posVXI[12], posVYI[12];
+    int centroV, centroH;
     out = criaImagem(in->largura, in->altura, in->n_canais);
     copiaConteudo(in,out);
 
-    // Percorre horizontalmente da esquerda para a direita (de cima para baixo)
+    
+    // Percorre verticalmente de cima para baixo
+    for (int j = 0; j < out->largura; j += passos){
+        for (int k = 0; k < out->altura - 6*passos; k += passos){
+            cont = 0;
+            if(out->dados[0][k + 0*passos][j] < 0.5f 
+                    && out->dados[0][k + 2*passos][j] < 0.5f 
+                    && out->dados[0][k + 3*passos][j] < 0.5f 
+                    && out->dados[0][k + 4*passos][j] < 0.5f
+                    && out->dados[0][k + 6*passos][j] < 0.5f)
+                cont += 5;
+            if (out->dados[0][k + passos][j] > 0.5f
+                    && out->dados[0][k + 5*passos][j] > 0.5f)
+                cont += 2;
+
+            if(cont == 7){
+                posVX[achouV] = j;
+                posVY[achouV] = k;
+                achouV++;
+                out->dados[0][k][j] = 1.0f;              
+//                for (int i = 0; i < 6*passos; i++)
+//                    out->dados[0][k+i][j] = 1.0f;
+            }
+        }
+    }
+
+    for (int i = 0; i < achouV; i++){
+        printf("Vertical: posX(%d) = %d\nposY(%d) = %d\n", i, posVX[i], i, posVY[i]);
+    }
+
+    achouV = 0;
+    // Percorre verticalmente de baixo para cima
+    for (int j = out->largura - 1; j >= 0; j -= passos){
+        for (int k = out->altura - 1; k >= 6*passos; k -= passos){
+            cont = 0;
+            if(out->dados[0][k - 0*passos][j] < 0.5f 
+                    && out->dados[0][k - 2*passos][j] < 0.5f 
+                    && out->dados[0][k - 3*passos][j] < 0.5f 
+                    && out->dados[0][k - 4*passos][j] < 0.5f
+                    && out->dados[0][k - 6*passos][j] < 0.5f)
+                cont += 5;
+            if (out->dados[0][k - passos][j] > 0.5f
+                    && out->dados[0][k - 5*passos][j] > 0.5f)
+                cont += 2;
+
+            if(cont == 7){
+                posVXI[achouV] = j;
+                posVYI[achouV] = k;
+                achouV++;
+                out->dados[0][k][j] = 1.0f;
+//                for (int i = 0; i < 6*passos; i++)
+//                    out->dados[0][k-i][j] = 0.0f;
+            }
+        }
+    }
+
+   for (int i = 0; i < achouV; i++){
+        printf("Vertical: posX(%d) = %d\nposY(%d) = %d\n", i, posVXI[i], i, posVYI[i]);
+    }
+
+    // Percorre horizontalmente da esquerda para a direita
     for (int j = 0; j < out->altura; j += passos){
         for (int k = 0; k < out->largura - 6*passos; k += passos){
             cont = 0;
@@ -154,94 +217,75 @@ Imagem *rotaciona(Imagem *in) {
                 cont += 2;
 
             if(cont == 7){
-                posHX[achou] = k;
-                posHY[achou] = j;
-                achou++;
+                posHX[achouH] = k;
+                posHY[achouH] = j;
+                achouH++;
                 out->dados[0][j][k] = 1.0f;
+//                for (int i = 0; i < 6*passos; i++)
+//                    out->dados[0][j][k+i] = 1.0f;
             }
         }
     }
 
-    for (int i = 0; i < achou; i++)
+    for (int i = 0; i < achouH; i++){
         printf("Horizontal: posX(%d) = %d\nposY(%d) = %d\n", i, posHX[i], i, posHY[i]);
+    }
     
-    // Percorre verticalmente de cima para baixo (da esquerda para direita)
-    achou = 0;
-    for (int j = posHX[0]; j < out->largura; j += passos){
-        for (int k = posHY[0]; k < out->altura - 6*passos; k += passos){
+    achouH = 0;
+    // Percorre horizontalmente da direita para a esquerda
+    for (int j = out->altura - 1; j >= 0; j -= passos){
+        for (int k = out->largura - 1; k >= 6*passos; k -= passos){
             cont = 0;
-            if(out->dados[0][k + 0*passos][j] < 0.5f 
-                    && out->dados[0][k + 2*passos][j] < 0.5f 
-                    && out->dados[0][k + 3*passos][j] < 0.5f 
-                    && out->dados[0][k + 4*passos][j] < 0.5f
-                    && out->dados[0][k + 6*passos][j] < 0.5f)
+            if(out->dados[0][j][k - 0*passos] < 0.5f 
+                    && out->dados[0][j][k - 2*passos] < 0.5f 
+                    && out->dados[0][j][k - 3*passos] < 0.5f 
+                    && out->dados[0][j][k - 4*passos] < 0.5f
+                    && out->dados[0][j][k - 6*passos] < 0.5f)
                 cont += 5;
-            if (out->dados[0][k + passos][j] > 0.5f
-                    && out->dados[0][k + 5*passos][j] > 0.5f)
+            if (out->dados[0][j][k - passos] > 0.5f
+                    && out->dados[0][j][k - 5*passos] > 0.5f)
                 cont += 2;
 
             if(cont == 7){
-                posVX[achou] = j;
-                posVY[achou] = k;
-                achou++;
-                out->dados[0][k][j] = 1.0f;
-            }
-        }
-    }
-
-    for (int i = 0; i < achou; i++)
-        printf("Vertical: posX(%d) = %d\nposY(%d) = %d\n", i, posVX[i], i, posVY[i]);
-
-
-    // Percorre verticalmente de baixo para cima (da esquerda para direita)
-/*    achou = 0;
-    for (int j = posVX[0]; j < out->largura; j += passos){
-        for (int k = posVY[0]; k < out->altura - 6*passos; k += passos){
-            cont = 0;
-            if(out->dados[0][k + 0*passos][j] < 0.5f 
-                    && out->dados[0][k + 2*passos][j] < 0.5f 
-                    && out->dados[0][k + 3*passos][j] < 0.5f 
-                    && out->dados[0][k + 4*passos][j] < 0.5f
-                    && out->dados[0][k + 6*passos][j] < 0.5f)
-                cont += 5;
-            if (out->dados[0][k + passos][j] > 0.5f
-                    && out->dados[0][k + 5*passos][j] > 0.5f)
-                cont += 2;
-
-            if(cont == 7){
-                posVX[achou] = j;
-                posVY[achou] = k;
-                achou++;
-                out->dados[0][k][j] = 1.0f;
-            }
-        }
-    }
-
-    for (int i = 0; i < achou; i++)
-        printf("Vertical: posX(%d) = %d\nposY(%d) = %d\n", i, posVX[i], i, posVY[i]);
-
-*/
-/*
-    for (int j = 0; j < out->altura - 6*passos; j += passos){
-        for (int k = 0; k < out->largura - 6*passos; k += passos){
-            cont = 0;
-            if(out->dados[0][j + 0*passos][k + 0*passos] < 0.5f 
-                    && out->dados[0][j + 2*passos][k + 2*passos] < 0.5f 
-                    && out->dados[0][j + 3*passos][k + 3*passos] < 0.5f 
-                    && out->dados[0][j + 4*passos][k + 4*passos] < 0.5f
-                    && out->dados[0][j + 6*passos][k + 6*passos] < 0.5f)
-                cont += 5;
-            if (out->dados[0][j + passos][k + passos] > 0.5f
-                    && out->dados[0][j + 5*passos][k + 5*passos] > 0.5f)
-                cont += 2;
-
-            if(cont == 7){
-                achou++;
+                posHXI[achouH] = k;
+                posHYI[achouH] = j;
+                achouH++;
                 out->dados[0][j][k] = 1.0f;
+//                for (int i = 0; i < 6*passos; i++)
+//                    out->dados[0][j][k-i] = 0.5f;
             }
         }
     }
-*/
+    
+    for (int i = 0; i < achouH; i++){
+        printf("Horizontal: posX(%d) = %d\nposY(%d) = %d\n", i, posHXI[i], i, posHYI[i]);
+    }
+
+    // checa dentre as coordenadas verticais o centro
+/*    for (int i = 0; i < achouV; i++){
+        for (int j = 0; j < achouV; j++){
+            if(abs(posVX[i] - posVXI[j]) < 32 && posVYI[j] - posVY[i] > 32
+                    && posVYI[j] - posVY[i] < out->altura/2
+                    && abs(posHX[i] - posHXI[j]) < out->largura/2){
+                centroH = (posHX[i] + posHXI[j])/2;
+                centroV = (posVY[i] + posVYI[j])/2;
+                out->dados[0][centroV][centroH] = 1.0f;
+            }
+        }
+    }
+
+    // checa dentre as coordenadas horizontais o centro
+    for (int i = 0; i < achouH; i++){
+        for (int j = 0; j < achouH; j++){
+            if(abs(posHY[i] - posHYI[j]) < 32 && posHXI[j] - posHX[i] > 32
+                    && posHXI[j] - posHX[i] < out->largura/2
+                    && abs(posVY[i] - posVYI[j]) < out->altura/2){
+                centroH = (posHX[i] + posHXI[j])/2;
+                centroV = (posVY[i] + posVYI[j])/2;
+                out->dados[0][centroV][centroH] = 1.0f;
+            }
+        }
+    }*/
 
     return out;
 }
