@@ -30,8 +30,8 @@ int main(){
     //centro = atribuiImagemCinza(original);
 
     centro = criaImagem(original->largura,original->altura,original->n_canais);
-    copiaConteudo(original,centro);
-//    centro = restringeCentro(original);
+//    copiaConteudo(original,centro);
+    centro = restringeCentro(original);
     salvaImagem(centro, "../resultados/Centro.png");
 
     binarizada = atribuiImagemCinza(centro);
@@ -41,7 +41,7 @@ int main(){
     //o local onde fica o AL Code!
     code = restringeFloodFill(binarizada);
     salvaImagem(code, "../resultados/Code.png");
-    
+
     rotacionada = rotaciona(code);
     salvaImagem(rotacionada, "../resultados/Rotacionada.png");
 
@@ -138,7 +138,7 @@ Imagem *rotaciona(Imagem *in) {
     int posHXI[4], posHYI[4];
     int posVX[12], posVY[12];
     int posVXI[12], posVYI[12];
-    int centroV, centroH;
+    int centroV = 0, centroH = 0;
     out = criaImagem(in->largura, in->altura, in->n_canais);
     copiaConteudo(in,out);
 
@@ -261,6 +261,35 @@ Imagem *rotaciona(Imagem *in) {
         printf("Horizontal: posX(%d) = %d\nposY(%d) = %d\n", i, posHXI[i], i, posHYI[i]);
     }
 
+    for (int i = 0; i < achouV; i++){
+        for (int j = 0; j < achouV; j++){
+            if (abs(posVX[i] - posVXI[j]) < 20){
+                centroH = (posVX[i] + posVXI[j])/2;
+                centroV = (posVY[i] + posVYI[j])/2;
+            }
+            else if (abs(posVY[i] - posVYI[j]) < 20){
+                centroH = (posVX[i] + posVXI[j])/2;
+                centroV = (posVY[i] + posVYI[j])/2;
+            }
+            if(centroH > 0 && centroV > 0)
+                out->dados[0][centroV][centroH] = 1.0f;
+        }
+    }
+
+    for (int i = 0; i < achouH; i++){
+        for (int j = 0; j < achouH; j++){
+            if (abs(posHX[i] - posHXI[j]) < 20){
+                centroH = (posHX[i] + posHXI[j])/2;
+                centroV = (posHY[i] + posHYI[j])/2;
+            }
+            else if (abs(posHY[i] - posHYI[j]) < 20){
+                centroH = (posHX[i] + posHXI[j])/2;
+                centroV = (posHY[i] + posHYI[j])/2;
+            }
+            if(centroH > 0 && centroV > 0)
+                out->dados[0][centroV][centroH] = 1.0f;
+        }
+    }
     // checa dentre as coordenadas verticais o centro
 /*    for (int i = 0; i < achouV; i++){
         for (int j = 0; j < achouV; j++){
